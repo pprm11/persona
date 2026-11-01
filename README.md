@@ -22,9 +22,32 @@ Nothing private lives here. Private history and settings belong to the `id` laye
 | `humanize-heavy` | The scored pipeline, script plus three agents, when the user asks for the heavy version |
 | `inline-widgets` | Answering with inline visual widgets for status, plans and comparisons |
 
-## Use it
+## Install
 
-Add the repo to your `self` manifest between `superego` and `collective`:
+Works with Claude Code, Codex, Cursor and the other agents the [skills.sh](https://www.skills.sh/) CLI supports.
+
+Install every skill:
+
+    npx skills add pprm11/persona
+
+Install one skill:
+
+    npx skills add pprm11/persona --skill root-cause
+
+Install several, globally, for Claude Code:
+
+    npx skills add pprm11/persona --skill root-cause --skill brief -g -a claude-code
+
+List what is available before installing:
+
+    npx skills add pprm11/persona --list
+
+Update later with `npx skills update`. Each skill lives in `skills/<name>/SKILL.md` with `name` and
+`description` frontmatter, which is what the CLI and skills.sh index.
+
+## Use it as a layer
+
+If you use the layered agent context, add the repo to your `self` manifest between `superego` and `collective`:
 
     {"level": "persona", "name": "persona", "path": "persona", "repo": "<this repo>", "active": true, "mode": "readonly"}
 
