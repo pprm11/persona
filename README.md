@@ -18,7 +18,8 @@ Nothing private lives here. Private history and settings belong to the `id` laye
 | `cross-harness-orchestration` | Parallel work and second opinions across coding agents |
 | `claude-workflow-orchestration` | Briefs and workflows for Claude models, long handoffs, failure recovery |
 | `staged-engineering` | A traceable six-stage design series, from problem to detailed design |
-| `humanize` | Rewriting text until it stops reading as machine-written |
+| `humanize` | One pass that makes a text read well for a human, voice and meaning kept (the default) |
+| `humanize-heavy` | The scored pipeline, script plus three agents, when the user asks for the heavy version |
 | `inline-widgets` | Answering with inline visual widgets for status, plans and comparisons |
 
 ## Use it
