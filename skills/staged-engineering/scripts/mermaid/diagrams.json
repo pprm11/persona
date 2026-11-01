@@ -1,0 +1,17 @@
+[
+ {
+  "f": "order-routing-3-hla",
+  "i": 1,
+  "src": "flowchart LR\n  C[Customer] --> P[Messaging provider]\n  P --> R[Order router]\n  R -->|v1 weight| A1[Order assistant v1]\n  R -->|v2 weight| A2[Order assistant v2]\n  R --> S[(Assignment store)]\n"
+ },
+ {
+  "f": "order-routing-3-hla",
+  "i": 2,
+  "src": "sequenceDiagram\n  autonumber\n  participant P as Messaging provider\n  participant R as Order router\n  participant S as Assignment store\n  participant A as Order assistant\n  P->>R: callback (customer message)\n  R->>S: read assignment\n  S-->>R: version v2\n  R->>A: forward message\n  A-->>R: 200 OK\n  R-->>P: 200 OK\n"
+ },
+ {
+  "f": "order-routing-4-hld",
+  "i": 1,
+  "src": "flowchart TB\n  subgraph AWS\n    GW[API Gateway] --> L[Router function]\n    L --> D[(DynamoDB)]\n    L --> M[Metrics and alarms]\n  end\n  L --> V1[Assistant v1]\n  L --> V2[Assistant v2]\n"
+ }
+]
