@@ -12,7 +12,7 @@ Terms: **stage** (one document of the series), **source** (the previous stage pl
 
 This skill covers the connected design series and its traceability. If your organization has its own procedure for this, follow that and use this one as the generic fallback, or when the user asks for it. Keep any safety and authorization rules that apply. For a single team RFC, use your RFC skill if you have one. When an RFC is one stage of a series, use both and keep the stage contract.
 
-To design each artifact, classify the audience and main type first (for example with an artifact-design skill, if available). If a classification already came with the request, reuse it. The series procedure and templates stay the source for the stages. Without a coordinator, adapt the design to the sources and the reader.
+This skill owns the genre: which documents the series has and what each must contain. For writing, building and checking each document (type per part, reader page, linking, diagrams, the three gates), use the superego skill `artifact-routing`: pass it this skill's stage brief and return its routing line. Do not call it back from there.
 
 ## The 6 stages
 
@@ -35,7 +35,7 @@ Every stage, including the test plan (stage 7), passes three gates before it clo
 - **Correct**: it does what is needed, including when something fails. Evidence: a counterexample, a recalculation, a POC with a negative control, official documentation, a second opinion from another model.
 - **Optimized**: the simplest and cheapest way that gives the same guarantees, with the numbers before and after.
 
-The criteria of each gate for the 7 stages, the pass rule and how to run it with several agents are in `references/quality-gates.md`. The brief for the correctness gate is in `references/correctness-brief.md`.
+`artifact-routing` runs the gates; the stage-specific criteria, the pass rule and how to run them with several agents are in `references/quality-gates.md`. The brief for the correctness gate is in `references/correctness-brief.md`.
 
 ## Rules that apply in every stage
 
@@ -48,10 +48,10 @@ They are in `references/cross-cutting.md`. The ones that broke most often in the
    - An owner's answer that contradicts a cited source or the code: apply the decision, open a Q# for the conflict and carry both numbers until it is answered.
    - A conditional decision ("in process if <= 50 ms, otherwise a managed service"): record the condition in the D#, choose by the measured value, and without a measurement treat the chosen branch as a P# with the POC that decides.
    - ID prefixes: BR, R, QS, AC, G, N (non-goal), A (assumption), Q, D, I (invariant), POL (policy), ADR, C (constraint), K (risk), L (accepted limit), AS (as-is constraint), NV (NOT VERIFIED), ALG (algorithm), P (proposed value), TS (test set), POC, DR (as-is drift).
-5. **Code with hash and line**: cite `path:lines` read at a fixed commit and run `scripts/permalinks.py`, which turns each citation into a link to that line at that commit (`?plain=1` for `.md`). Never link to a branch. `--sha` is the commit you actually read: reading the local checkout and citing another commit produces links to the wrong line, and the script reports "LINES DIFFER FROM CHECKOUT". `permalinks.py --show` prints the lines of every citation: read them and confirm they say what the text claims (`--check` only catches lines outside the file). In stage text, cite the skill's scripts by name only (`privacy_scan.py`), without `scripts/`, so `permalinks.py` does not treat them as repo files.
+5. **Code with hash and line**: cite `path:lines` read at a fixed commit, never a branch, and turn each citation into a link with the `artifact-routing` script `permalinks.py` (`--sha` is the commit you actually read; `--show` prints every cited line so you confirm it says what the text claims).
 6. **Stable IDs**: a new item takes the next number. A removed item stays as "Removed in revision N: <reason>". Every document opens with "In one minute" and "What changed in revision N".
-7. **Never real personal data**: a phone number, national ID or lead e-mail becomes synthetic in the same format. `privacy_scan.py` skips the synthetic prefixes defined at its top (`SYNTHETIC`); change them to the prefixes your team uses. Run `scripts/privacy_scan.py` on the document and on the published page. A verification command never prints a secret: use `kubectl get secret <n> -o jsonpath='{.data}' | jq 'keys'` or `env | cut -d= -f1`, never the value.
-8. **Readability**: apply a technical-writing readability pass (answer first, one term per concept, short sentences) and confirm with `scripts/preserve.py` that no number, ID, tag or code changed in a rewrite.
+7. **Never real personal data**: a phone number, national ID or lead e-mail becomes synthetic in the same format. Run the `artifact-routing` script `privacy_scan.py` on the document and on the published page. A verification command never prints a secret: use `kubectl get secret <n> -o jsonpath='{.data}' | jq 'keys'` or `env | cut -d= -f1`, never the value.
+8. **Readability**: follow `artifact-routing` (writing rules and the `preserve.py` check that no number, ID, tag or code changed in a rewrite).
 
 ## Flow to create a stage
 
@@ -66,8 +66,8 @@ They are in `references/cross-cutting.md`. The ones that broke most often in the
    - every POC has a negative control that fails without the protection under test;
    - the cost covers the topology of the Deployment section, line by line;
    - no cited command prints a secret value.
-7. **Verify**: `preserve.py` if the text was rewritten, `permalinks.py --check`, `privacy_scan.py`, and the page build with no broken anchor and no ID without a definition. The build runs locally even when publishing is not allowed. It needs the `markdown` package (`pip install --target assets/pylib markdown`, once).
-8. **Publish** (only with the user's word, or when they asked for an artifact): one page with the stages in order, stage cards, and IDs with link and tooltip. Use `assets/page/`; set `RFCS_DIR` and `SERIES_PREFIX` for `build.py` (and the commit prefixes in `refs.py`).
+7. **Verify** with the `artifact-routing` checks (`preserve.py` if the text was rewritten, `permalinks.py --check`, `privacy_scan.py`, and the page build with no broken anchor and no ID without a definition). The build runs locally even when publishing is not allowed.
+8. **Publish** (only with the user's word, or when they asked for an artifact): one page with the stages in order, built by `artifact-routing` (`reader-page.md`). The series supplies the order, the stage cards and the ID prefixes.
 
 ## When the source changes: cascade
 
@@ -80,24 +80,16 @@ Use a cheap model for mechanical checks, a mid-tier model to read and write one 
 ## Known pitfalls
 
 - A term renamer breaks articles ("an Variant") and proper names ("Argo Canary releases"): review the diff.
-- Mermaid: the node id `in` is a reserved word; a semicolon in a sequence message breaks the diagram.
 - IDs from another source (the as-is uses A1, P2 as check ids) collide with the series ids: turn auto-linking off for that stage.
 - A list right after a paragraph line, with no blank line, becomes part of the paragraph in Markdown.
 - A large artifact (over 1 MB) can be republished to the same link only after reading the whole published page: keep the page lean or plan a new link.
 
-## Diagrams and page
+## Diagrams, page and scripts
 
-The rules for each diagram (legend, direction, `autonumber`, colors by role, validation with `scripts/mermaid/check.mjs`) and what the published page does with them (full screen with zoom, definition on node hover, linked edges, figure index, links on evidence tags) are in `references/diagrams-and-page.md`.
-
-## Scripts
-
-- `scripts/preserve.py ORIG REV`: compares headings, code, tags, URLs, IDs and numbers between two versions.
-- `scripts/permalinks.py --repo-dir <repo> --sha <commit> --github <owner/repo> FILES`: links to the line at the commit.
-- `scripts/privacy_scan.py FILES`: phone numbers, national IDs, e-mail, tokens, chat links and database URLs with passwords.
-- `scripts/mermaid/check.mjs FILE.md`: every mermaid block in the file must pass the parser (run `npm install` in the folder once). `extract.py`, `measure.html` and `search.js` measure diagram sizes and pick the best layout direction; `diagrams.json` is a small sample.
-- `assets/page/`: `build.py`, `refs.py`, `shell.html`, `reader.js` and `reader.css` for the series page (definition popover with usages, search, scroll spy, back button, section links, print). The shell and `diagrams.json` use a fictional "Acme order router" as the example.
+Diagram rules, the published page, linking and the check scripts (`permalinks.py`, `preserve.py`, `privacy_scan.py`, `check.mjs`, `build_page.py`) belong to the superego skill `artifact-routing`. This skill keeps no scripts or page assets.
 
 ## Related
 
+- `artifact-routing` (superego): how each document is written, built and checked.
 - A humanize or de-AI writing skill, for text that does not read as machine-written.
 - A task-card skill, for the tasks that follow the HLD.
