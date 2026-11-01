@@ -51,7 +51,7 @@ authorization.
 
 ## Related
 
-- `ub-mode`: metrics (CRAP, duplication, mutation) and what counts as subtraction in scope
+- `ub-mode` (Uncle Bob's, from https://github.com/unclebob/ub-mode): metrics (CRAP, duplication, mutation) and what counts as subtraction in scope
 - `root-cause`: tracing a finding back to its origin
 - Stop a review cycle that does not converge: if two fixes with the same premise fail the same gate, or each new reviewer finds new problems for 2 rounds, write the premise in one sentence, show the numbers per round and ask before fixing anything else.
 - A recurring finding becomes a lint or a test.

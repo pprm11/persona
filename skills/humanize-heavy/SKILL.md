@@ -103,3 +103,7 @@ For a composed invocation, return the revised bounded text or file and the score
 1. **The final text**, in a fenced block, ready to copy.
 2. The score breakdown: script score with failed checks, rubric votes per check, combined total per round.
 3. One or two sentences on what changed. If the bar wasn't reached within the caps, say so plainly and name the checks that wouldn't move.
+
+## Credits
+
+Part of the AI-tell lexicon in `scripts/ai_tells.py` comes from Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing), kept by WikiProject AI Cleanup.

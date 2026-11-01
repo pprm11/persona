@@ -17,7 +17,7 @@ says what to do; the skill named next to it has the procedure.
 ## Engineering
 
 - **Engineering in English**; the local language only for the client.
-- **Code follows `ub-mode`**: every code change goes through that skill; push and PR follow the layer's rules.
+- **Code follows `ub-mode`** (Uncle Bob's skill, `npx skills add unclebob/ub-mode`): every code change goes through it; push and PR follow the layer's rules.
 - **Review before push**: use `critical-code-review`.
 - **Root cause first** (`root-cause`): reproduce, Ishikawa and whys down to the proven root, fix the root and add a
   guard. Containment is allowed only when labeled and tracked by a task for the root.
