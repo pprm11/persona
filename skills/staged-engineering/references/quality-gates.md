@@ -4,7 +4,7 @@ A stage closes only when it passes all three. They are different questions, with
 
 | Gate | Question | Reviewer | Evidence that counts |
 |---|---|---|---|
-| **Well written** | Can a cold reader understand, check and decide without asking? | Sonnet with `technical-doc-readability` + a cold reader (another agent, no context) | The cold reader's answers to the stage checklist; `preserve.py`; traceability; a source on every number |
+| **Well written** | Can a cold reader understand, check and decide without asking? | Sonnet applying the `artifact-routing` writing rules + a cold reader (another agent, no context) | The cold reader's answers to the stage checklist; `preserve.py`; traceability; a source on every number |
 | **Correct** | Does it do what it must, including when something goes wrong? | Adversarial Opus per area + a second opinion from another model (Codex) | Counterexample, script that explores interleavings, recomputation, POC with a negative control, official documentation with URL and date |
 | **Optimized** | Is it the simplest and cheapest way to give the same guarantees, including swapping the technology or removing the piece? | Opus "what can be removed, merged or made cheaper" + a measurement script | Before and after numbers (cost, calls per message, latency per hop, nodes, tests), the simpler alternative tested and why it loses |
 
@@ -51,7 +51,7 @@ Finding format (all three gates): Id · Gate · Severity · Where (file, section
 
 ## How to run with several agents
 
-- Well written: one Sonnet applies `technical-doc-readability` and `preserve.py`; another agent, with no context, answers the stage checklist (questions a cold reader must answer) from the document alone.
+- Well written: one Sonnet applies the `artifact-routing` writing rules and `preserve.py`; another agent, with no context, answers the stage checklist (questions a cold reader must answer) from the document alone.
 - Correct: one Opus per area with `correctness-brief.md` (algorithms and concurrency; architecture, limits and cost; requirements against the as-is; evidence and POCs) and one Codex with the same scope, without seeing the other findings.
 - Optimized: one Opus with the question "what can be removed, merged, moved to another technology or made cheaper while keeping every R#, AC and invariant", starting with the question most expensive to get wrong: does this piece need to exist? With a measurement script (cost per line, DynamoDB calls and capacity units per path, hops and latency, test suite time).
 - The three run in parallel; the findings are merged into one table; fixes per stage; a new round only on the areas touched.
