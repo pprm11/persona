@@ -36,6 +36,9 @@ class CatalogTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "document.md"
             cases = [
+                ("```inline code```\n[after](missing.md)\n", ["broken link: missing.md"]),
+                ("[before](missing.md)\n```md\n[hidden](...)\n", ["unclosed fence at line 2", "broken link: missing.md"]),
+                ("~~~~\n~~~\n", ["unclosed fence at line 1"]),
                 ("```lang\n[inside](missing.md)\n````\n[after](missing.md)\n", ["broken link: missing.md"]),
                 ("```\nexample\n````\n[after](missing.md)\n````\nexample\n````\n", ["broken link: missing.md"]),
                 ("~~~lang\n[inside](missing.md)\n~~~~~\n[after](...)\n", ["broken link: ..."]),

@@ -23,11 +23,13 @@ FENCE_CLOSE = re.compile(r'^[ \t]*(`{3,}|~{3,})[ \t]*$')
 def outside_fences(text):
     lines = []
     fence = None
-    for line in text.splitlines(keepends=True):
+    opening_line = None
+    for number, line in enumerate(text.splitlines(keepends=True), start=1):
         if fence is None:
             match = FENCE_OPEN.match(line)
-            if match:
+            if match and not (match.group(1).startswith("`") and "`" in line[match.end():]):
                 fence = match.group(1)
+                opening_line = number
                 lines.append("\n")
             else:
                 lines.append(line)
@@ -35,8 +37,9 @@ def outside_fences(text):
             match = FENCE_CLOSE.fullmatch(line.rstrip("\r\n"))
             if match and match.group(1)[0] == fence[0] and len(match.group(1)) >= len(fence):
                 fence = None
+                opening_line = None
             lines.append("\n")
-    return "".join(lines)
+    return "".join(lines), opening_line
 
 def link_exists(folder, target):
     # Windows drops trailing dots and spaces from a path segment, so '...' would resolve to the folder itself.
@@ -53,7 +56,10 @@ def audit_file(path, private_terms=()):
     if pattern and pattern.search(text):
         errors.append('private marker')
     if path.suffix == '.md':
-        for target in LINK.findall(outside_fences(text)):
+        prose, opening_line = outside_fences(text)
+        if opening_line is not None:
+            errors.append(f"unclosed fence at line {opening_line}")
+        for target in LINK.findall(prose):
             target = target.split('#', 1)[0]
             if target and not re.match(r'^(?:https?://|mailto:|<)', target) and not link_exists(path.parent, target):
                 errors.append('broken link: ' + target)
