@@ -32,12 +32,38 @@ class CatalogTests(unittest.TestCase):
             p.write_text('["["]', encoding='utf-8')
             self.assertEqual(2, release(ROOT, str(p)))
 
+    def test_fenced_links_and_privacy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "document.md"
+            cases = [
+                ("```inline code```\n[after](missing.md)\n", ["broken link: missing.md"]),
+                ("[before](missing.md)\n```md\n[hidden](...)\n", ["unclosed fence at line 2", "broken link: missing.md"]),
+                ("~~~~\n~~~\n", ["unclosed fence at line 1"]),
+                ("```lang\n[inside](missing.md)\n````\n[after](missing.md)\n", ["broken link: missing.md"]),
+                ("```\nexample\n````\n[after](missing.md)\n````\nexample\n````\n", ["broken link: missing.md"]),
+                ("~~~lang\n[inside](missing.md)\n~~~~~\n[after](...)\n", ["broken link: ..."]),
+                ("````\n```\n[inside](missing.md)\n````\n[after](missing.md)\n", ["broken link: missing.md"]),
+                ("~~~\n```\n[inside](missing.md)\n~~~~\n", []),
+            ]
+            for text, expected in cases:
+                with self.subTest(text=text):
+                    path.write_text(text, encoding="utf-8")
+                    self.assertEqual(expected, audit_file(path))
+            path.write_text("```\nPRIVATE_FIXTURE\n````\n", encoding="utf-8")
+            self.assertIn("private marker", audit_file(path, ["PRIVATE_FIXTURE"]))
+            path.write_text("```\n" + "sk-" + "abcdefghijklmnopqrstuv" + "\n````\n", encoding="utf-8")
+            self.assertIn("secret token", audit_file(path))
+
     def test_negative_controls(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp)/'sample'; folder.mkdir(); path=folder/'SKILL.md'
             valid='---\nname: sample\ndescription: Example\n---\n\n# Sample\n'
             path.write_text(valid, encoding='utf-8'); self.assertEqual([], audit_file(path))
             path.write_text(valid+'[missing](no-file.md)', encoding='utf-8'); self.assertTrue(any('broken link' in x for x in audit_file(path)))
+            path.write_text(valid+'[placeholder](...)', encoding='utf-8'); self.assertIn('broken link: ...', audit_file(path))
+            path.write_text(valid+'[trailing](SKILL.md.)', encoding='utf-8'); self.assertIn('broken link: SKILL.md.', audit_file(path))
+            path.write_text(valid+'```\n[example](...)\n```\n~~~\n[example](missing.md)\n~~~\n', encoding='utf-8'); self.assertEqual([], audit_file(path))
+            path.write_text(valid+'```\n[example](...)\n```\n[after](missing.md)\n', encoding='utf-8'); self.assertIn('broken link: missing.md', audit_file(path))
             path.write_text(valid+'\n'+'sk-'+'abcdefghijklmnopqrstuv', encoding='utf-8'); self.assertIn('secret token', audit_file(path))
             path.write_text(valid+'\n'+'C:' + '\\' + 'Users' + '\\' + 'fixture', encoding='utf-8'); self.assertIn('user path', audit_file(path))
             path.write_text(valid+'\n'+'PRIVATE_FIXTURE', encoding='utf-8'); self.assertIn('private marker', audit_file(path, ['PRIVATE_FIXTURE']))
