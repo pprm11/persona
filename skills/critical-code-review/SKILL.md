@@ -33,8 +33,10 @@ findings with file:line, severity, a concrete failure scenario and a suggested f
   not change, belongs to the task (ub-mode, Subtract Before You Add); loose refactoring remains a finding.
   Spec check: list the ticket or spec requirements and mark each as met, partial, missing or wrong, quoting the
   spec line for every item that is not met. Follow a requirement beyond the diff to its callers, config and docs.
-  A gap the diff did not create becomes a follow-up note and does not block the push. When every requirement is
-  met, say so with the mapping and add no gap of your own; without a spec, note that.
+  An inherited gap unrelated to the requested outcome becomes a follow-up note and does not block the push. An
+  unmet requirement, or an existing weakness that the change now exposes or depends on, is judged by its impact
+  like any other finding, whoever wrote the old code. When every requirement is met, say so with the mapping and
+  add no gap of your own; without a spec, note that.
 
 ## 3. Triage and correction
 
