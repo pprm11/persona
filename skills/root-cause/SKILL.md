@@ -15,7 +15,11 @@ root fix, guard. A solution appears only at step 5. Before that, every solution 
 
 One observable sentence with what, where, since when and how much (cases, %), with a source. No cause and no
 solution in it. "CI fails" is not enough; "the `test-domain` check fails in 4 of 10 runs since PR #212, with a
-Postgres timeout" is. Reproduce the problem before going on: without a reproduction, step 4 has no proof.
+Postgres timeout" is. Reproduce the problem before going on: without a reproduction, step 4 has no proof. Record
+the command or sequence, the input, the observed symptom and the criterion that tells a correct result. A command
+that fails with a different error does not reproduce this bug. When useful, shrink the case one element at a
+time, and rerun the original case after the fix. The exemption at the end of this skill still applies: a stack
+trace that already proves the single cause needs no reproduction harness.
 
 ## 2. Fishbone (6 categories)
 
@@ -39,6 +43,11 @@ For the 1 to 3 causes with the most evidence, ask "why?" until you reach a cause
 - is not just "human error" or "the agent got it wrong": ask why the process let the error through.
 
 It usually takes 3 to 5 levels. If the chain leaves the team's control (vendor, customer), stop there and record it.
+
+When two or more causes stay plausible, write for each the observation that would weaken it, then choose one probe
+that tells them apart and change one thing per probe. The number of hypotheses follows the evidence. Two techniques,
+only when they fit: in a chain of components, log once at each boundary to see where the value goes wrong; when a
+test passes alone and fails in the suite, bisect the test order to find the one that pollutes shared state.
 
 ## 4. Proof
 
@@ -66,7 +75,8 @@ The problem; the fishbone as a table (category, cause, fact or hypothesis, sourc
 widget when there are 3 or more causes; the chain of whys; the root and its proof; the actions with their label.
 Scale to the size: a small bug fits in 5 lines, an incident or a test-battery result needs the full table.
 
-Exempt: a typo, or an error whose single cause the stack trace itself proves. Even then, answer "why did this get
+Exempt: a typo, or an error whose single cause the stack trace or log itself proves. That needs no reproduction
+harness and no list of hypotheses. Even then, answer "why did this get
 through?" to decide the guard.
 
 ## Pitfalls

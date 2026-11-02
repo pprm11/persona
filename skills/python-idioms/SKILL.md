@@ -19,7 +19,11 @@ Set timeouts on remote calls. Retry only failures that can safely be retried, wi
 
 ## Verify
 
-Test observable behavior, error paths and relevant invariants. Inject a clock instead of relying on sleeps; use fakes at external boundaries when appropriate. Property tests are useful for parser round trips and idempotency when meaningful. Run the project’s configured tests, formatter, lint and type checks; report unavailable checks. Do not impose heavyweight tooling on a throwaway script merely for consistency. For review findings include location, consequence, evidence and a specific correction.
+Test observable behavior, error paths and relevant invariants. Inject a clock instead of relying on sleeps; use fakes at external boundaries when appropriate. Property tests are useful for parser round trips and idempotency when meaningful.
+
+Flag a tautological test: its expected value recomputes the implementation (the same formula, the same filter, a hash of the same expression), so the test stays green when the logic is wrong. Expect a literal or an independently derived oracle, or properties the specification states. Flag a vacuous property: a strategy or `assume()` filter that rejects almost every input, so the body rarely runs; generate valid inputs directly and keep `assume` for rare residue. Accept a determinism check (same valid input, same output) on code that could hold hidden state, such as a cache, a seeded generator or a digest, and say why; companion assertions that pin something independent make it a sound test.
+
+Run the project’s configured tests, formatter, lint and type checks; report unavailable checks. Do not impose heavyweight tooling on a throwaway script merely for consistency. For review findings include location, consequence, evidence and a specific correction.
 
 ## Further reading
 
