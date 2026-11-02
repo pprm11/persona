@@ -1,5 +1,4 @@
 ---
-level: persona
 name: brief
 description: "Request format (brief): required lines, defaults for each missing line, and how the agent applies them. Use when a new request arrives outside the format, when Goal, Done when or Mode is missing, or when the user asks for the brief, the request format or the template."
 ---

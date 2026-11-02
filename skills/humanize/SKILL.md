@@ -1,9 +1,6 @@
 ---
-level: persona
-metadata:
-  level: persona
 name: humanize
-description: Rewrite a text so it reads well for a human, in the author's voice, with the meaning intact. One pass, no scorer, no agents. Use on /humanize, "humanize this", "make this read better", or before delivering any written piece. When the user asks for the heavy, full or scored version ("humanize pesada", "with the scorer", "does this sound AI-written?"), use `humanize-heavy` instead.
+description: Rewrite a text so it reads well for a human, in the author's voice, with the meaning intact. One pass, no scorer, no agents. Use on /humanize, "humanize this", "make this read better", or before delivering any written piece. When the user asks for the heavy, full or scored version ("with the scorer", "does this sound AI-written?"), use `humanize-heavy` instead.
 ---
 
 # Humanize

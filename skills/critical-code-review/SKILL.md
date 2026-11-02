@@ -1,7 +1,6 @@
 ---
-level: persona
 name: critical-code-review
-description: "Review a branch before push through four lenses, with scope audit and corrections. Use for a very critical code review or a review before pushing; reviewing an existing PR's comments is a separate skill."
+description: "Review a branch before push through four lenses, with scope audit and corrections. Use for a very critical code review or a review before pushing; reviewing an existing PR as a reviewer is a separate skill."
 ---
 
 # Critical code review
@@ -16,9 +15,9 @@ PR-review skill. Retain applicable safety and authorization requirements.
 Define the base (the PR's target branch) and list the diff (`git diff --stat <base>...HEAD`). If another
 branch was merged in, separate what came from it from what belongs to this task.
 
-## 2. Parallel reviewers (Agent, read-only, same message)
+## 2. Review lenses
 
-Each one receives the file list, the task goal and the repo's agent instructions (AGENTS.md); each returns
+When authorized subagents are available, each receives the file list, task goal and repository instructions. Otherwise review the lenses sequentially and disclose the lack of independent review. Each lens yields
 findings with file:line, severity, a concrete failure scenario and a suggested fix.
 - **CR1 bugs and behavior**: error paths, fail-open, per-run state not cleaned, concurrency, test
   regressions, regex erasing a response.
@@ -34,7 +33,7 @@ findings with file:line, severity, a concrete failure scenario and a suggested f
 ## 3. Triage and correction
 
 - Verify each finding (read the code) before accepting it; discard false positives and say why.
-- For each accepted finding, ask why it got through and where it originates (skill `root-cause`): the same
+- For each accepted finding, ask why it got through and where it originates (skill `root-cause` if installed; otherwise reproduce and test competing causes): the same
   pattern in several files is fixed at the source (helper, template, prompt), and the finding gets a guard
   (lint or test).
 - Fix what belongs to this task. What belongs to another task: revert it here and record it as a separate task.

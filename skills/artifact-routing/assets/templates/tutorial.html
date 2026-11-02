@@ -1,0 +1,406 @@
+<!-- Fictional worked example; do not treat sample facts as real. -->
+<title>Rotate Your First Logs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Tokens: light by default; dark follows the system unless the host forces a theme. Every color below comes from a token. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --fg: #1b2230; --muted: #5a6475; --line: #dde1e8;
+  --accent: #2c4f9e; --accent-soft: #e6ecf8; --on-accent: #ffffff;
+  --warn: #8a5a00; --warn-soft: #fbf1dc; --ok: #1f6b45; --ok-soft: #e1f2e8; --code-bg: #eef0f4;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark }
+/* Print always uses the light tokens (same specificity as the dark rules above, declared later). */
+@media print { :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+  --bg: #ffffff; --surface: #ffffff; --fg: #111111; --muted: #444444; --line: #bbbbbb;
+  --accent: #1d3f86; --accent-soft: #eef2fb; --on-accent: #ffffff;
+  --warn: #6b4500; --warn-soft: #fbf1dc; --ok: #14502f; --ok-soft: #e1f2e8; --code-bg: #f1f1f1; color-scheme: light } }
+
+/* Base */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--f-body); }
+main h1 { font: 600 clamp(27px, 5vw, 34px)/1.15 var(--f-display); margin: 0 0 10px; text-wrap: balance; }
+main h2 { font: 600 26px/1.2 var(--f-display); margin: 40px 0 12px; text-wrap: balance; }
+main h3 { font: 600 20px/1.3 var(--f-display); margin: 30px 0 8px; text-wrap: balance; }
+main h4 { font: 600 16px var(--f-display); margin: 22px 0 6px; }
+main p, main li, main dd { max-width: 78ch; overflow-wrap: anywhere; }
+main a { color: var(--accent); }
+code { font: 0.86em var(--f-mono); background: var(--code-bg); border-radius: 3px; padding: 1px 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--f-mono); margin: 12px 0; }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
+blockquote { margin: 12px 0; padding: 4px 14px; border-left: 3px solid var(--line); color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+.eyebrow { font: 500 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.meta { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+
+/* Header and the In one minute slot */
+header.top { margin-bottom: 8px; }
+.oneminute { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 4px 18px 12px; margin: 16px 0 0; }
+.oneminute h2 { font-size: 18px; margin: 12px 0 6px; }
+
+/* Overview cards (optional) */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; margin: 24px 0 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; }
+main a.card { color: inherit; }
+.card:hover, .card:focus-visible { border-color: var(--accent); }
+.card .k { font: 500 12px var(--f-mono); color: var(--accent); letter-spacing: .04em; }
+.card .t { font: 600 16px/1.25 var(--f-display); }
+.card .d { font-size: 13px; color: var(--muted); flex: 1; }
+.card .f { font: 12px var(--f-mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 6px; }
+
+/* Callouts and chips: the label carries the meaning, color only reinforces it */
+.callout { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px 16px; margin: 14px 0; }
+.callout > :first-child { margin-top: 0; } .callout > :last-child { margin-bottom: 0; }
+.callout--warn { background: var(--warn-soft); border-left-color: var(--warn); }
+.callout--ok { background: var(--ok-soft); border-left-color: var(--ok); }
+.callout .label { font: 600 13px var(--f-display); letter-spacing: .03em; text-transform: uppercase; color: var(--accent); }
+.callout--warn .label { color: var(--warn); } .callout--ok .label { color: var(--ok); }
+.chip { display: inline-block; font: 600 12px var(--f-mono); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.chip--ok { background: var(--ok-soft); color: var(--ok); } .chip--warn { background: var(--warn-soft); color: var(--warn); }
+.chip--muted { background: var(--code-bg); color: var(--muted); }
+
+/* Numbered steps (tutorial and how-to) */
+ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 16px 0; display: grid; gap: 14px; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 4px 14px; max-width: none; }
+ol.steps > li::before { content: counter(step); grid-row: 1 / span 3; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+  font: 600 15px var(--f-display); color: var(--accent); background: var(--accent-soft); }
+ol.steps > li > * { grid-column: 2; min-width: 0; margin-top: 0; margin-bottom: 0; }
+
+/* Decisions and open questions (optional block) */
+.asks { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 20px 20px; margin: 32px 0; }
+.asks h2 { margin-top: 12px; }
+.asks-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
+.asks-col { min-width: 0; }
+.asks-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--accent); padding-bottom: 6px; margin-bottom: 10px; }
+.asks-head h3 { margin: 0; font-size: 18px; }
+.asks ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; }
+.asks .q { font-weight: 600; }
+.asks .a { display: block; color: var(--muted); font-size: 14px; }
+
+/* Glossary (feeds the term popovers) */
+dl.glossary { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); gap: 0 20px; margin: 12px 0; }
+dl.glossary dt { padding: 8px 0; border-top: 1px solid var(--line); }
+dl.glossary dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--line); max-width: none; }
+
+/* Footer */
+footer.pagefoot { border-top: 1px solid var(--line); margin-top: 56px; padding-top: 16px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+
+@media (max-width: 960px) { .asks-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { dl.glossary { grid-template-columns: minmax(0, 1fr); } dl.glossary dt { padding-bottom: 0; } dl.glossary dd { border-top: 0; padding-top: 2px; } }
+@media print { .oneminute, .asks, .card { break-inside: avoid; } }
+
+/* Tutorial additions: OS labels and the success line. Tokens only. */
+.oslabel { font: 600 12px var(--f-mono); color: var(--muted); margin: 10px 0 -4px; }
+p.expect { border-left: 4px solid var(--ok); background: var(--ok-soft); border-radius: 0 6px 6px 0; padding: 4px 12px; margin: 8px 0; }
+p.expect strong { color: var(--ok); }
+ol.steps > li > h3 { font-size: 18px; }
+
+/* reader.css */
+/* /reader.css */
+</style>
+
+<div class="reader-root" lang="en">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+
+<nav class="index" id="contents" aria-label="Contents">
+<button class="searchbtn" type="button" id="searchbtn">Search  ( / or Ctrl+K )</button>
+</nav>
+
+<main id="main" data-reader="all" data-id-prefixes="S,CMD,CFG">
+
+<header class="top" id="top">
+<p class="eyebrow">Driftwood 2.4.0 · Tutorial · Sample content</p>
+<h1>Rotate Your First Logs</h1>
+<section class="oneminute" aria-labelledby="one-minute">
+<h2 id="one-minute" data-nomenu>In one minute</h2>
+<p>You rotate and compress a log file with Driftwood 2.4.0 in a throwaway folder, so nothing outside that folder changes. You finish with a compressed Generation, a restored copy of it and a <code>driftwood.toml</code> you wrote yourself. You need a terminal and Driftwood 2.4.0 on your path. There are six steps, and each one ends with the output you should see. The page is sample content for a fictional product and was never run.</p>
+</section>
+<p class="meta">As of 2026-11-01 · Revision 1 · Steps last run: never (sample content) · Owner: docs team</p>
+</header>
+
+<div class="tabs" role="tablist" aria-label="Driftwood guide">
+<button type="button" role="tab" id="tab-tutorial" aria-controls="tutorial" aria-selected="true">Tutorial</button>
+<button type="button" role="tab" id="tab-howto" aria-controls="howto" aria-selected="false">How-to guide</button>
+<button type="button" role="tab" id="tab-reference" aria-controls="reference" aria-selected="false">Reference</button>
+</div>
+
+<div id="tutorial" role="tabpanel" aria-labelledby="tab-tutorial">
+
+<div class="callout callout--warn"><p><span class="label">Sample content</span></p><p>Driftwood is a fictional tool and the outputs below are illustrative. In a real tutorial every output is pasted from a run, and the as-of line names the systems it ran on. A step you could not run carries <code>[UNTESTED]</code>.</p></div>
+
+<h2 id="before-you-start">Before you start</h2>
+<p>This table lists what you need and how to check it. Every command in this tutorial runs inside one folder, <code>driftwood-sandbox</code>, which you create in step S1. Nothing else on your machine is read or changed.</p>
+<table>
+<thead><tr><th>You need</th><th>Version</th><th>Check with</th><th>You should see</th></tr></thead>
+<tbody>
+<tr><td>Driftwood</td><td>2.4.0</td><td><code>driftwood --version</code></td><td><code>driftwood 2.4.0</code></td></tr>
+<tr><td>A terminal</td><td>bash, zsh or PowerShell 7</td><td><code>echo ok</code></td><td><code>ok</code></td></tr>
+<tr><td>Free disk space</td><td>1 MB</td><td>none</td><td>none</td></tr>
+</tbody>
+</table>
+<p>If <code>driftwood --version</code> fails, install it first with <a href="#howto-install">Install Driftwood 2.4.0</a> and come back.</p>
+
+<h2 id="what-you-will-do">What you will do</h2>
+<p>The list gives each step an ID, so other tabs and the failure table can point to it.</p>
+<ul>
+<li><span class="defid" id="def-S1">S1</span>. Create the Sandbox. Make a scratch folder holding a 2,000-line log file.</li>
+<li><span class="defid" id="def-S2">S2</span>. Create the config. Run <code>driftwood init</code> to get a default <code>driftwood.toml</code>.</li>
+<li><span class="defid" id="def-S3">S3</span>. Set the limits. Lower <code>max_size</code> to 64KB and <code>keep</code> to 3 so the log is large enough to rotate.</li>
+<li><span class="defid" id="def-S4">S4</span>. Check before you run. Ask Driftwood what it would do, without changing a file.</li>
+<li><span class="defid" id="def-S5">S5</span>. Run the Rotation. Move the Live log into a compressed Generation.</li>
+<li><span class="defid" id="def-S6">S6</span>. Restore the Generation. Copy the Generation back, to see the run can be undone.</li>
+</ul>
+
+<h2 id="steps">Do the steps</h2>
+<ol class="steps">
+
+<li>
+<h3 id="step-sandbox">Create the Sandbox with a sample log</h3>
+<p class="meta">Step 1 of 6 · Changes: creates the folder <code>driftwood-sandbox</code> and the file <code>app.log</code> inside it.</p>
+<p>Make the folder, move into it and fill <code>app.log</code> with 2,000 lines. The log is the file Driftwood will rotate.</p>
+<p class="oslabel">macOS and Linux (bash, zsh)</p>
+<pre><code>mkdir driftwood-sandbox &amp;&amp; cd driftwood-sandbox
+for i in $(seq 1 2000); do echo "2026-11-01T10:00:00Z INFO request $i ok"; done &gt; app.log</code></pre>
+<p class="oslabel">Windows (PowerShell 7)</p>
+<pre><code>mkdir driftwood-sandbox; cd driftwood-sandbox
+1..2000 | ForEach-Object { "2026-11-01T10:00:00Z INFO request $_ ok" } | Set-Content app.log</code></pre>
+<p>Then list the folder.</p>
+<pre><code>ls</code></pre>
+<p class="expect"><strong>You should see:</strong> one file named <code>app.log</code>. On Windows the listing is a table with the same name.</p>
+<pre><code>app.log</code></pre>
+<p>If the shell says <code>mkdir: cannot create directory</code>, you are in a read-only folder. Run <code>cd ~</code> and repeat this step.</p>
+</li>
+
+<li>
+<h3 id="step-init">Create the config file</h3>
+<p class="meta">Step 2 of 6 · Changes: creates <code>driftwood.toml</code> in the Sandbox.</p>
+<p>Run <code>driftwood init</code>. It writes a starter config in the current folder, and every later command reads it.</p>
+<pre><code>driftwood init</code></pre>
+<p class="expect"><strong>You should see:</strong></p>
+<pre><code>wrote ./driftwood.toml</code></pre>
+<p>Print the file to see what it holds. The file uses <abbr title="Tom's Obvious Minimal Language">TOML</abbr>, a plain text format of <code>key = value</code> lines.</p>
+<pre><code>cat driftwood.toml</code></pre>
+<p class="expect"><strong>You should see:</strong> the five keys of the <code>[rotate]</code> table with their defaults. <code>path = "."</code> points at the current folder.</p>
+<pre><code>[rotate]
+path = "."
+keep = 7
+compress = "gzip"
+max_size = "50MB"
+schedule = "daily"</code></pre>
+<p>If you see <code>error: config not found</code> in a later step, you left the Sandbox. Run <code>cd driftwood-sandbox</code> and repeat from here.</p>
+</li>
+
+<li>
+<h3 id="step-limits">Set the limits</h3>
+<p class="meta">Step 3 of 6 · Changes: rewrites <code>driftwood.toml</code> in the Sandbox.</p>
+<p>Your log is 81KB, far below the default limit of 50MB, so nothing would rotate. Replace the config with a lower <code>max_size</code> (CFG4) and a smaller <code>keep</code> (CFG2). The other keys keep their defaults.</p>
+<p class="oslabel">macOS and Linux (bash, zsh)</p>
+<pre><code>cat &gt; driftwood.toml &lt;&lt;'EOF'
+[rotate]
+path = "."
+keep = 3
+compress = "gzip"
+max_size = "64KB"
+schedule = "daily"
+EOF</code></pre>
+<p class="oslabel">Windows (PowerShell 7)</p>
+<pre><code>@'
+[rotate]
+path = "."
+keep = 3
+compress = "gzip"
+max_size = "64KB"
+schedule = "daily"
+'@ | Set-Content driftwood.toml</code></pre>
+<p class="expect"><strong>You should see:</strong> no output. The next step shows the new limits.</p>
+</li>
+
+<li>
+<h3 id="step-check">Check before you run</h3>
+<p class="meta">Step 4 of 6 · Changes: nothing. <code>driftwood check</code> only reads.</p>
+<p>Ask Driftwood what a run would do. <code>driftwood check</code> (CMD3) is safe to repeat as often as you like.</p>
+<pre><code>driftwood check</code></pre>
+<p class="expect"><strong>You should see:</strong> the config accepted and the log marked as due. The exit code is 1, which here only means a file is due.</p>
+<pre><code>config: ./driftwood.toml ok
+due  ./app.log   81KB &gt; max_size 64KB
+1 file due</code></pre>
+<p>If the second line starts with <code>ok</code> instead of <code>due</code>, the log is not above <code>max_size</code>. Repeat step S1 and S3. If the first line is <code>error: config not found</code>, run <code>pwd</code> and make sure it ends in <code>driftwood-sandbox</code>.</p>
+</li>
+
+<li>
+<h3 id="step-run">Run the rotation</h3>
+<p class="meta">Step 5 of 6 · Changes: renames <code>app.log</code> to Generation 1, compresses it and creates a new empty <code>app.log</code>.</p>
+<div class="callout callout--warn"><p><span class="label">Warning</span></p><p><code>driftwood run</code> rotates every Live log that is due in the folder named by <code>path</code>. Run it only in <code>driftwood-sandbox</code>. If you run it in a real log folder, its due Live logs are rotated too, and <code>driftwood restore</code> is how you get them back (see <a href="#howto-restore">Restore a rotated file</a>).</p></div>
+<p>Confirm where you are, then run it.</p>
+<pre><code>pwd
+driftwood run --verbose</code></pre>
+<p class="expect"><strong>You should see:</strong> the path ends in <code>driftwood-sandbox</code>, then the report of one rotated file.</p>
+<pre><code>rotated ./app.log -&gt; app.log.1.gz
+1 file rotated, 0 skipped</code></pre>
+<p>List the folder again.</p>
+<pre><code>ls</code></pre>
+<p class="expect"><strong>You should see:</strong> three names. Sizes differ by a few bytes on your machine; the names matter. The hidden folder <code>.driftwood</code> also exists, and <code>ls</code> does not show it.</p>
+<pre><code>app.log  app.log.1.gz  driftwood.toml</code></pre>
+<p>The figure shows what changed. The new <code>app.log</code> is empty, and the 81KB of lines now sit in Generation 1.</p>
+<p><strong>Figure: The Sandbox before and after the run.</strong> Read left to right: the big log and the config go into the run, and an empty log and Generation 1 come out. (Legend: blue rectangle is a file you had, green rectangle is a file the run created, yellow rounded box is the command, dashed gray box is the config.)</p>
+<div class="diagram" id="fig-run" data-caption="The Sandbox before and after the run">
+<pre class="mermaid">%%{init: {"flowchart": {"nodeSpacing": 22, "rankSpacing": 30, "padding": 6, "diagramPadding": 4}}}%%
+flowchart LR
+accTitle: The Sandbox before and after the run
+accDescr: The 81KB app.log and the config driftwood.toml go into driftwood run. The run produces a new empty app.log and Generation 1, app.log.1.gz.
+big["app.log<br/>81KB"]:::old
+cfg["driftwood.toml<br/>max_size 64KB"]:::config
+runN(["driftwood run"]):::action
+fresh["app.log<br/>empty, new"]:::made
+arch["app.log.1.gz<br/>Generation 1"]:::made
+big --> runN
+cfg -.->|limit| runN
+runN --> fresh
+runN --> arch
+classDef old fill:#cfe0ff,stroke:#2c4f9e,stroke-width:2px,color:#10224a
+classDef made fill:#cdebd8,stroke:#1f6b45,stroke-width:2px,color:#0d2e1d
+classDef action fill:#fbe3a8,stroke:#8a5a00,stroke-width:2px,color:#2a1a00
+classDef config fill:#e8e8ee,stroke:#555555,stroke-width:2px,stroke-dasharray:5 3,color:#111111</pre>
+<details class="figtext"><summary>Text version</summary>
+<ul>
+<li>Inputs: <code>app.log</code> (81KB) and <code>driftwood.toml</code> (dashed link, labeled limit).</li>
+<li>Process: <code>driftwood run</code>.</li>
+<li>Outputs: a new empty <code>app.log</code> and Generation 1, <code>app.log.1.gz</code>.</li>
+</ul>
+</details>
+</div>
+<p>If you see <code>error: permission denied on /var/log/app</code>, you ran the command in a real log folder. Nothing was written, because the folder is protected. Run <code>cd</code> back to the Sandbox and repeat this step.</p>
+</li>
+
+<li>
+<h3 id="step-restore">Restore the archive</h3>
+<p class="meta">Step 6 of 6 · Changes: creates <code>app.log.restored</code>. Generation 1 and the Live log stay as they are.</p>
+<p>Rotation is reversible. <code>driftwood restore</code> (CMD4) copies a Generation back into a new file, so you can read the old lines. FILE is the Live log name, and Generation 1 is the default.</p>
+<pre><code>driftwood restore app.log</code></pre>
+<p class="expect"><strong>You should see:</strong></p>
+<pre><code>restored app.log.1.gz -&gt; app.log.restored</code></pre>
+<p>Print the first line to confirm the content came back.</p>
+<pre><code>head -n 1 app.log.restored</code></pre>
+<p class="expect"><strong>You should see:</strong> the first line you wrote in step S1. On PowerShell use <code>Get-Content app.log.restored -TotalCount 1</code>.</p>
+<pre><code>2026-11-01T10:00:00Z INFO request 1 ok</code></pre>
+<p>If you add <code>--generation 9</code>, the command prints <code>error: generation 9 not found for app.log</code>, because the Archive holds only Generation 1. Run <code>ls</code> and use a number from a file named <code>app.log.N.gz</code>.</p>
+</li>
+
+</ol>
+
+<h2 id="what-you-learned">What you learned</h2>
+<p>You wrote a <code>driftwood.toml</code> and set two of its options (S3). You asked Driftwood what a run would do before running it (S4), and you saw one Rotation turn an 81KB log into a compressed Generation and a fresh empty log (S5). You also undid it with a restore (S6). That is the whole cycle Driftwood repeats on a schedule.</p>
+
+<h2 id="try-it-yourself">Try it yourself</h2>
+<p>Add a second log and predict the result before you press Enter. Repeat the log command of step S1 with <code>worker.log</code> instead of <code>app.log</code>, then run <code>driftwood check</code>.</p>
+<p class="expect"><strong>You should see:</strong> a line for each log. <code>app.log</code> is 0KB and is not due, and <code>worker.log</code> is 81KB and is due.</p>
+<pre><code>config: ./driftwood.toml ok
+ok   ./app.log   0KB
+due  ./worker.log   81KB &gt; max_size 64KB
+1 file due</code></pre>
+
+<h2 id="clean-up">Clean up</h2>
+<div class="callout callout--warn"><p><span class="label">Warning</span></p><p>This deletes the folder <code>driftwood-sandbox</code> and everything inside it, including the Generation. It cannot be undone. Run it from the folder that contains the Sandbox, and use the folder name exactly.</p></div>
+<p class="oslabel">macOS and Linux (bash, zsh)</p>
+<pre><code>cd .. &amp;&amp; rm -r driftwood-sandbox</code></pre>
+<p class="oslabel">Windows (PowerShell 7)</p>
+<pre><code>cd ..; Remove-Item -Recurse driftwood-sandbox</code></pre>
+<p class="expect"><strong>You should see:</strong> no output, and <code>ls</code> no longer lists <code>driftwood-sandbox</code>.</p>
+
+<h2 id="if-something-goes-wrong">If something goes wrong</h2>
+<p>This table lists the messages you can meet in this tutorial, keyed by the exact text. Find yours and follow the action.</p>
+<table>
+<thead><tr><th>You see</th><th>Cause</th><th>Do this</th></tr></thead>
+<tbody>
+<tr><td><code>error: config not found</code></td><td>The shell is not in the Sandbox, or <code>driftwood init</code> was skipped.</td><td>Run <code>cd driftwood-sandbox</code>. If <code>ls</code> shows no <code>driftwood.toml</code>, repeat step S2.</td></tr>
+<tr><td><code>error: permission denied on /var/log/app</code></td><td>The shell is in a real, protected log folder.</td><td>Leave it with <code>cd</code> to the Sandbox and repeat the step. Do not use <code>sudo</code>.</td></tr>
+<tr><td><code>ok   ./app.log   12KB</code></td><td>The log is not above <code>max_size</code>.</td><td>Repeat steps S1 and S3.</td></tr>
+<tr><td><code>error: generation 9 not found for app.log</code></td><td>The Archive holds no Generation with that number, or the run did not happen.</td><td>Run <code>ls</code>. If <code>app.log.1.gz</code> is missing, repeat step S5.</td></tr>
+<tr><td><code>driftwood: command not found</code> or <code>'driftwood' is not recognized</code></td><td>Driftwood is not installed or not on your path.</td><td>Follow <a href="#howto-install">Install Driftwood 2.4.0</a>, then open a new terminal.</td></tr>
+</tbody>
+</table>
+
+<h2 id="where-next">Where to go next</h2>
+<ul>
+<li>Do it for real: <a href="#howto-restore">Restore a rotated file</a> in the How-to tab.</li>
+<li>Look up every option: <a href="#def-CFG5">the <code>schedule</code> option</a> and the rest of the Reference tab.</li>
+</ul>
+
+<section id="glossary">
+<h2>Terms</h2>
+<dl class="glossary">
+<dt class="defterm">Archive</dt><dd>The set of compressed Generations kept for one Live log.</dd>
+<dt class="defterm">Generation</dt><dd>A numbered Archive copy of a Live log, such as <code>app.log.1.gz</code>. Generation 1 is the newest.</dd>
+<dt class="defterm" data-aliases="live logs">Live log</dt><dd>A log file that an application still writes to, such as <code>app.log</code>.</dd>
+<dt class="defterm" data-aliases="rotate, rotated">Rotation</dt><dd>The act of renaming a Live log to Generation 1 and starting an empty Live log.</dd>
+<dt class="defterm">Sandbox</dt><dd>A throwaway folder where a tutorial runs, so no real file is touched.</dd>
+</dl>
+</section>
+
+</div>
+
+<div id="howto" role="tabpanel" aria-labelledby="tab-howto" hidden>
+<div class="callout"><p><span class="label">Sample stub</span></p><p>The full How-to tab is its own template. These two entries exist so the tutorial links resolve.</p></div>
+<h2 id="howto-heading">How-to guide</h2>
+<h3 id="howto-install">Install Driftwood 2.4.0</h3>
+<p>Goal: <code>driftwood --version</code> prints <code>driftwood 2.4.0</code>. Done when it does, in a new terminal.</p>
+<pre><code>driftwood --version</code></pre>
+<h3 id="howto-restore">Restore a rotated file</h3>
+<p>Goal: read the lines of a Generation without touching the Live log. Run <code>driftwood restore FILE</code>, where FILE is the Live log name, for example <code>app.log</code>. The result is <code>FILE.restored</code>.</p>
+<pre><code>driftwood restore FILE</code></pre>
+</div>
+
+<div id="reference" role="tabpanel" aria-labelledby="tab-reference" hidden>
+<div class="callout"><p><span class="label">Sample stub</span></p><p>The full Reference tab is its own template. These rows exist so the tutorial links resolve. Driftwood 2.4.0.</p></div>
+<h2 id="ref-commands">Commands</h2>
+<table>
+<thead><tr><th>ID</th><th>Command</th><th>What it does</th><th>Changes files</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-CMD1">CMD1</span></td><td><code>driftwood init</code></td><td>Writes a starter <code>driftwood.toml</code> in the folder of <code>--dir</code>, the current folder by default.</td><td>Yes</td></tr>
+<tr><td><span class="defid" id="def-CMD2">CMD2</span></td><td><code>driftwood run</code></td><td>Rotates and compresses every Live log that is due.</td><td>Yes</td></tr>
+<tr><td><span class="defid" id="def-CMD3">CMD3</span></td><td><code>driftwood check</code></td><td>Validates the config and lists the Live logs that are due.</td><td>No</td></tr>
+<tr><td><span class="defid" id="def-CMD4">CMD4</span></td><td><code>driftwood restore</code></td><td>Copies a Generation of a Live log back into <code>FILE.restored</code>.</td><td>Yes</td></tr>
+</tbody>
+</table>
+<h2 id="ref-options">Keys in driftwood.toml</h2>
+<p>All keys live in the <code>[rotate]</code> table.</p>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Default</th><th>Allowed values</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-CFG1">CFG1</span></td><td><code>path</code></td><td>string</td><td>none, required</td><td>an existing folder that holds the Live logs</td></tr>
+<tr><td><span class="defid" id="def-CFG2">CFG2</span></td><td><code>keep</code></td><td>integer</td><td><code>7</code></td><td>1 to 365</td></tr>
+<tr><td><span class="defid" id="def-CFG3">CFG3</span></td><td><code>compress</code></td><td>string</td><td><code>"gzip"</code></td><td><code>"none"</code>, <code>"gzip"</code>, <code>"zstd"</code></td></tr>
+<tr><td><span class="defid" id="def-CFG4">CFG4</span></td><td><code>max_size</code></td><td>string</td><td><code>"50MB"</code></td><td>an integer plus KB, MB or GB, such as <code>"64KB"</code></td></tr>
+<tr><td><span class="defid" id="def-CFG5">CFG5</span></td><td><code>schedule</code></td><td>string</td><td><code>"daily"</code></td><td><code>"hourly"</code>, <code>"daily"</code>, <code>"weekly"</code>, or a 5-field cron expression</td></tr>
+</tbody>
+</table>
+</div>
+
+<footer class="pagefoot">
+<span>As of 2026-11-01 · Revision 1</span>
+<span>Sample content for a fictional product. Report an error to the docs team.</span>
+<a href="#top">Back to top</a>
+</footer>
+
+</main>
+</div>
+</div>
+
+
+<script>
+// reader.js
+// /reader.js
+</script>

@@ -1,0 +1,378 @@
+<!-- Fictional worked example; do not treat sample facts as real. -->
+<title>Rotate Logs with Driftwood</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Tokens: light by default; dark follows the system unless the host forces a theme. Every color below comes from a token. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --fg: #1b2230; --muted: #5a6475; --line: #dde1e8;
+  --accent: #2c4f9e; --accent-soft: #e6ecf8; --on-accent: #ffffff;
+  --warn: #8a5a00; --warn-soft: #fbf1dc; --ok: #1f6b45; --ok-soft: #e1f2e8; --code-bg: #eef0f4;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark }
+/* Print always uses the light tokens (same specificity as the dark rules above, declared later). */
+@media print { :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+  --bg: #ffffff; --surface: #ffffff; --fg: #111111; --muted: #444444; --line: #bbbbbb;
+  --accent: #1d3f86; --accent-soft: #eef2fb; --on-accent: #ffffff;
+  --warn: #6b4500; --warn-soft: #fbf1dc; --ok: #14502f; --ok-soft: #e1f2e8; --code-bg: #f1f1f1; color-scheme: light } }
+
+/* Base */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--f-body); }
+main h1 { font: 600 clamp(27px, 5vw, 34px)/1.15 var(--f-display); margin: 0 0 10px; text-wrap: balance; }
+main h2 { font: 600 26px/1.2 var(--f-display); margin: 40px 0 12px; text-wrap: balance; }
+main h3 { font: 600 20px/1.3 var(--f-display); margin: 30px 0 8px; text-wrap: balance; }
+main h4 { font: 600 16px var(--f-display); margin: 22px 0 6px; }
+main p, main li, main dd { max-width: 78ch; overflow-wrap: anywhere; }
+main a { color: var(--accent); }
+code { font: 0.86em var(--f-mono); background: var(--code-bg); border-radius: 3px; padding: 1px 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--f-mono); margin: 12px 0; }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
+blockquote { margin: 12px 0; padding: 4px 14px; border-left: 3px solid var(--line); color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+.eyebrow { font: 500 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.meta { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+
+/* Header and the In one minute slot */
+header.top { margin-bottom: 8px; }
+.oneminute { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 4px 18px 12px; margin: 16px 0 0; }
+.oneminute h2 { font-size: 18px; margin: 12px 0 6px; }
+
+/* Overview cards (optional) */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; margin: 24px 0 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; }
+main a.card { color: inherit; }
+.card:hover, .card:focus-visible { border-color: var(--accent); }
+.card .k { font: 500 12px var(--f-mono); color: var(--accent); letter-spacing: .04em; }
+.card .t { font: 600 16px/1.25 var(--f-display); }
+.card .d { font-size: 13px; color: var(--muted); flex: 1; }
+.card .f { font: 12px var(--f-mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 6px; }
+
+/* Callouts and chips: the label carries the meaning, color only reinforces it */
+.callout { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px 16px; margin: 14px 0; }
+.callout > :first-child { margin-top: 0; } .callout > :last-child { margin-bottom: 0; }
+.callout--warn { background: var(--warn-soft); border-left-color: var(--warn); }
+.callout--ok { background: var(--ok-soft); border-left-color: var(--ok); }
+.callout .label { font: 600 13px var(--f-display); letter-spacing: .03em; text-transform: uppercase; color: var(--accent); }
+.callout--warn .label { color: var(--warn); } .callout--ok .label { color: var(--ok); }
+.chip { display: inline-block; font: 600 12px var(--f-mono); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.chip--ok { background: var(--ok-soft); color: var(--ok); } .chip--warn { background: var(--warn-soft); color: var(--warn); }
+.chip--muted { background: var(--code-bg); color: var(--muted); }
+
+/* Numbered steps (tutorial and how-to) */
+ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 16px 0; display: grid; gap: 14px; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 4px 14px; max-width: none; }
+ol.steps > li::before { content: counter(step); grid-row: 1 / span 3; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+  font: 600 15px var(--f-display); color: var(--accent); background: var(--accent-soft); }
+ol.steps > li > * { grid-column: 2; min-width: 0; margin-top: 0; margin-bottom: 0; }
+
+/* Decisions and open questions (optional block) */
+.asks { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 20px 20px; margin: 32px 0; }
+.asks h2 { margin-top: 12px; }
+.asks-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
+.asks-col { min-width: 0; }
+.asks-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--accent); padding-bottom: 6px; margin-bottom: 10px; }
+.asks-head h3 { margin: 0; font-size: 18px; }
+.asks ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; }
+.asks .q { font-weight: 600; }
+.asks .a { display: block; color: var(--muted); font-size: 14px; }
+
+/* Glossary (feeds the term popovers) */
+dl.glossary { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); gap: 0 20px; margin: 12px 0; }
+dl.glossary dt { padding: 8px 0; border-top: 1px solid var(--line); }
+dl.glossary dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--line); max-width: none; }
+
+/* Footer */
+footer.pagefoot { border-top: 1px solid var(--line); margin-top: 56px; padding-top: 16px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+
+@media (max-width: 960px) { .asks-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { dl.glossary { grid-template-columns: minmax(0, 1fr); } dl.glossary dt { padding-bottom: 0; } dl.glossary dd { border-top: 0; padding-top: 2px; } }
+@media print { .oneminute, .asks, .card { break-inside: avoid; } }
+
+/* reader.css */
+/* /reader.css */
+</style>
+<div class="reader-root" lang="en">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+
+<nav class="index" id="contents" aria-label="Contents">
+<button class="searchbtn" type="button" id="searchbtn">Search  ( / or Ctrl+K )</button>
+</nav>
+
+<main id="main" data-reader="all" data-id-prefixes="F">
+
+<header class="top" id="top">
+<p class="eyebrow">Sample content · How-to guide · Driftwood 2.4.0</p>
+<h1>Rotate Logs with Driftwood</h1>
+<section class="oneminute" aria-labelledby="one-minute">
+<h2 id="one-minute" data-nomenu>In one minute</h2>
+<p>You will rotate and compress the logs of one application, so old logs shrink and only the last 7 stay on disk. You need Driftwood 2.4.0, write access to the log folder and about the size of the log folder in free disk. The steps cover Linux, macOS and Windows.</p>
+<p>Step 5 renames the Live log, so step 1 makes a copy first. The Windows scheduled task in step 6 was not run yet; see the pending notice below.</p>
+</section>
+<p class="meta">As of 2026-11-01 · Revision 1 · Tested on Driftwood 2.4.0 with Ubuntu 24.04 and macOS 15 · Windows 11 partly</p>
+</header>
+
+<div class="callout callout--warn" id="pending-windows">
+<span class="label">Pending</span>
+<p>Pending: the Windows scheduled task in <a href="#step-schedule">step 6</a> was not run on a clean Windows machine. Owner: docs maintainer. Needed for: step 6 on Windows.</p>
+</div>
+
+<section id="goal">
+<h2 id="goal-done">Goal and done when</h2>
+<p>The goal is a log folder that Driftwood rotates by itself: each Rotation moves the Live log to a compressed Generation, and no more than 7 Generations stay.</p>
+<p><strong>Done when</strong> <code>driftwood check</code> prints <code>0 files due</code>, and the log folder holds <code>app.log</code> plus Generations named <code>app.log.1.gz</code> and up.</p>
+</section>
+
+<section id="before">
+<h2 id="before-you-start">Before you start</h2>
+<p>These conditions must hold. The checks run in the log folder and print what the second column shows.</p>
+<table>
+<thead><tr><th>Requirement</th><th>Needed</th><th>Check</th><th>You should see</th></tr></thead>
+<tbody>
+<tr><td>Driftwood installed</td><td>2.4.0</td><td><code>driftwood --version</code></td><td><code>driftwood 2.4.0</code></td></tr>
+<tr><td>Write access to the log folder</td><td>Your user owns it, or is in its group</td><td><code>test -w /var/log/app &amp;&amp; echo writable</code></td><td><code>writable</code></td></tr>
+<tr><td>Free disk</td><td>At least the size of the log folder, for the copy</td><td><code>du -sh /var/log/app</code></td><td>a size smaller than your free space</td></tr>
+<tr><td>The app writes <code>app.log</code></td><td>One Live log in the folder</td><td><code>ls /var/log/app</code></td><td><code>app.log</code></td></tr>
+</tbody>
+</table>
+<p>The examples use <code>/var/log/app</code> on Linux and macOS and <code>C:\logs\app</code> on Windows. Replace them with your own folder. Windows blocks use PowerShell, and the checks above have the same meaning there: <code>Test-Path C:\logs\app</code> and <code>Get-ChildItem C:\logs\app</code>.</p>
+<p>This guide changes the log folder: it adds <code>driftwood.toml</code>, renames <code>app.log</code> and adds compressed Generations. It also adds one scheduled job.</p>
+</section>
+
+<section id="path">
+<h2 id="which-path">Which path applies</h2>
+<p>Start at the top. If you already have a <code>driftwood.toml</code>, skip to the check.</p>
+<p><strong>Figure: Which steps apply to you.</strong> Follow the arrows from the first box to the end. Legend: a diamond is a question about your folder, a rounded box is an action, a dashed box is where a failure leads.</p>
+<div class="diagram" id="fig-path"><pre class="mermaid">%%{init: {"flowchart": {"nodeSpacing": 22, "rankSpacing": 30, "padding": 6, "diagramPadding": 4}}}%%
+flowchart TB
+accTitle: Which steps apply to you
+accDescr: A folder with no driftwood.toml goes through init and edit, then check, run, schedule and verify. A folder that has the file goes straight to check. A failed check leads to the failure table.
+start(["Back up the folder<br/>Step 1"]) --> has{"driftwood.toml<br/>exists?"}
+has -- no --> init("Create it<br/>Step 2") --> edit("Check the keys<br/>Step 3")
+has -- yes --> chk
+edit --> chk("Check the config<br/>Step 4")
+chk -- ok --> run("Rotate once<br/>Step 5")
+chk -. error .-> fail["Failure table"]
+run --> sched("Schedule it<br/>Step 6") --> ver("Verify")
+classDef action fill:#cfe0f7,stroke:#1d3f86,stroke-width:2px,color:#101828
+classDef decision fill:#f6e3b4,stroke:#7a5200,stroke-width:2px,color:#101828
+classDef failure fill:#f2c4bb,stroke:#8a2d1c,stroke-width:2px,stroke-dasharray:5 3,color:#101828
+class start,init,edit,chk,run,sched,ver action
+class has decision
+class fail failure
+</pre>
+<details class="figtext"><summary>Text version</summary>
+<p>Step 1 backs up the folder. If <code>driftwood.toml</code> does not exist, step 2 creates it and step 3 checks the keys. If it exists, go straight to step 4. Step 4 checks the config: ok leads to step 5, an error leads to the failure table. Step 5 rotates once, step 6 schedules it, and Verify ends the guide.</p>
+</details>
+</div>
+</section>
+
+<section id="steps-section">
+<h2 id="steps">Steps</h2>
+<p>Run the steps in order. After each one, compare the output with the line that starts <em>You should see</em>. If it differs, stop and go to the failure table.</p>
+<ol class="steps">
+
+<li id="step-backup">
+<h3 id="copy-the-log-folder">Copy the log folder</h3>
+<p>Make a copy now, because step 5 renames <code>app.log</code>.</p>
+<p><strong>Linux and macOS</strong></p>
+<pre><code>cp -a /var/log/app /var/log/app.bak</code></pre>
+<p><strong>Windows (PowerShell)</strong></p>
+<pre><code>Copy-Item C:\logs\app C:\logs\app.bak -Recurse</code></pre>
+<p>You should see: no output. <code>ls /var/log/app.bak</code> lists <code>app.log</code>.</p>
+</li>
+
+<li id="step-init">
+<h3 id="create-the-config">Create the config</h3>
+<p>Driftwood reads <code>driftwood.toml</code> from the folder you run it in. Create it there.</p>
+<p><strong>Linux and macOS</strong></p>
+<pre><code>cd /var/log/app
+driftwood init</code></pre>
+<p><strong>Windows (PowerShell)</strong></p>
+<pre><code>Set-Location C:\logs\app
+driftwood init</code></pre>
+<p>You should see:</p>
+<pre><code>wrote ./driftwood.toml</code></pre>
+<p>If you see <code>error: permission denied on /var/log/app</code>, go to F2. If you see <code>error: driftwood.toml already exists</code>, keep your file and go to step 4.</p>
+</li>
+
+<li id="step-edit">
+<h3 id="check-the-keys">Check the keys</h3>
+<p>Open <code>driftwood.toml</code> in your editor and make sure the <code>[rotate]</code> table holds these values, which are the defaults. A Rotation then keeps 7 Generations and compresses them with gzip. A Live log is due when <code>app.log</code> is above 50MB or once a day, whichever comes first. Leave <code>path = "."</code> as it is, because you run Driftwood from the log folder.</p>
+<pre><code>[rotate]
+path = "."
+keep = 7
+compress = "gzip"
+max_size = "50MB"
+schedule = "daily"</code></pre>
+<p>You should see: the file saved, with these values. Step 4 checks them.</p>
+</li>
+
+<li id="step-check">
+<h3 id="check-the-config">Check the config</h3>
+<p>Run this before the first rotation. It reads the file and changes nothing.</p>
+<pre><code>driftwood check</code></pre>
+<p>You should see:</p>
+<pre><code>config: ./driftwood.toml ok
+due  ./app.log   62MB &gt; max_size 50MB
+1 file due</code></pre>
+<p>Exit code 1 here only means a file is due. If the first line differs, do not continue. <code>error: config not found</code> is F1. <code>error: invalid value for keep</code> is F3.</p>
+</li>
+
+<li id="step-run">
+<h3 id="rotate-once">Rotate once</h3>
+<div class="callout callout--warn"><span class="label">Changes your files</span>
+<p>This renames <code>app.log</code> to Generation 1 and starts a new <code>app.log</code>. Do it only if step 4 printed <code>config: ./driftwood.toml ok</code>. If nothing is due, the run changes nothing.</p></div>
+<pre><code>driftwood run</code></pre>
+<p>You should see:</p>
+<pre><code>1 file rotated, 0 skipped</code></pre>
+<p>If you see <code>error: another run holds the lock</code>, go to F4.</p>
+</li>
+
+<li id="step-schedule">
+<h3 id="schedule-it">Schedule it</h3>
+<p>Driftwood does not start itself. Call <code>driftwood run</code> every hour. It rotates a Live log only when it is due, which means the size is above <code>max_size</code> or the <code>schedule</code> time has been reached, so an hourly call is safe.</p>
+<p><strong>Linux and macOS (cron)</strong></p>
+<pre><code>crontab -l &gt; crontab.bak
+(crontab -l 2>/dev/null; echo '0 * * * * cd /var/log/app &amp;&amp; driftwood run') | crontab -</code></pre>
+<p>You should see: no output. <code>crontab -l</code> ends with the line <code>0 * * * * cd /var/log/app &amp;&amp; driftwood run</code>.</p>
+<p><strong>Windows (PowerShell)</strong> [UNTESTED]</p>
+<pre><code>schtasks /Create /SC HOURLY /TN Driftwood /TR "cmd /c cd /d C:\logs\app &amp;&amp; driftwood run"</code></pre>
+<p>You should see: <code>SUCCESS: The scheduled task "Driftwood" has successfully been created.</code></p>
+</li>
+
+</ol>
+</section>
+
+<section id="verify-section">
+<h2 id="verify">Verify the result</h2>
+<p>Read the state instead of trusting the last output. Both checks must match.</p>
+<p><strong>Linux and macOS</strong></p>
+<pre><code>driftwood check
+ls /var/log/app</code></pre>
+<p><strong>Windows (PowerShell)</strong></p>
+<pre><code>driftwood check
+Get-ChildItem C:\logs\app</code></pre>
+<p>You should see:</p>
+<pre><code>config: ./driftwood.toml ok
+ok   ./app.log   0KB
+0 files due
+app.log  app.log.1.gz  driftwood.toml</code></pre>
+<p>The goal is met when <code>0 files due</code> prints and at most 7 Generations are listed.</p>
+</section>
+
+<section id="failures">
+<h2 id="if-something-fails">If something fails</h2>
+<p>Find the line you see, copy it into search if the table is long, and repeat the step named in the last column.</p>
+<table>
+<thead><tr><th>Id</th><th>You see</th><th>Cause</th><th>Do this</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-F1">F1</span></td><td><code>error: config not found</code></td><td>You are not in the folder that holds <code>driftwood.toml</code>, or step 2 did not run</td><td>Run <code>cd /var/log/app</code> and repeat <a href="#step-check">step 4</a>. If the file is missing, repeat <a href="#step-init">step 2</a></td></tr>
+<tr><td><span class="defid" id="def-F2">F2</span></td><td><code>error: permission denied on /var/log/app</code></td><td>Your user cannot write to the folder. The path in the message is the folder you ran in</td><td>Run as the owner of the folder, or give your group write access, then repeat the step that failed</td></tr>
+<tr><td><span class="defid" id="def-F3">F3</span></td><td><code>error: invalid value for keep: 400 (allowed 1 to 365)</code></td><td><code>keep</code> is outside 1 to 365. The number in the message is the value you set</td><td>Set <code>keep = 7</code> in <code>driftwood.toml</code> and repeat <a href="#step-check">step 4</a></td></tr>
+<tr><td><span class="defid" id="def-F4">F4</span></td><td><code>error: another run holds the lock</code></td><td>Another <code>driftwood run</code> is active and holds the Lock file <code>.driftwood/lock</code>. The exit code is 4</td><td>Wait for the other run to end, then repeat <a href="#step-run">step 5</a></td></tr>
+<tr><td><span class="defid" id="def-F5">F5</span></td><td><code>error: driftwood.toml already exists</code></td><td>Step 2 ran before in this folder. The exit code is 2</td><td>Keep the file. Go to <a href="#step-check">step 4</a></td></tr>
+<tr><td><span class="defid" id="def-F6">F6</span></td><td><code>0 files rotated, 0 skipped</code></td><td>Not a failure. No Live log is due: the <code>schedule</code> time has not come and <code>app.log</code> is not above <code>max_size</code></td><td>Nothing. Wait for the next period or lower <code>max_size</code></td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="rerun">
+<h2 id="run-it-again">Run it again</h2>
+<p>Steps 3 and 4 are always safe to repeat. Steps 1, 5 and 6 are not, so read what a second run does before you repeat them.</p>
+<table>
+<thead><tr><th>Step</th><th>Second run</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td><a href="#step-backup">1. Copy</a></td><td>Harmful</td><td>The copy lands inside <code>app.bak</code>. Remove <code>app.bak</code> first, or use another name</td></tr>
+<tr><td><a href="#step-init">2. Create</a></td><td>No-op</td><td>Prints <code>error: driftwood.toml already exists</code> and keeps your file</td></tr>
+<tr><td><a href="#step-edit">3. Set</a></td><td>Safe</td><td>Saving the same values changes nothing</td></tr>
+<tr><td><a href="#step-check">4. Check</a></td><td>Safe</td><td>Reads only</td></tr>
+<tr><td><a href="#step-run">5. Rotate</a></td><td>No-op, then harmful</td><td>Prints <code>0 files rotated, 0 skipped</code> while no Live log is due. When <code>app.log</code> is due again it rotates again and deletes the Generations beyond <code>keep</code></td></tr>
+<tr><td><a href="#step-schedule">6. Schedule</a></td><td>Harmful</td><td>A second line runs the job twice an hour. The Lock file stops the overlap, but remove the duplicate</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="undo-section">
+<h2 id="undo">Undo</h2>
+<p>Undo in reverse order. You can stop after any step.</p>
+<ol class="steps">
+<li id="undo-schedule">
+<h3 id="remove-the-schedule">Remove the schedule</h3>
+<p><strong>Linux and macOS</strong></p>
+<pre><code>crontab crontab.bak</code></pre>
+<p><strong>Windows (PowerShell)</strong> [UNTESTED]</p>
+<pre><code>schtasks /Delete /TN Driftwood /F</code></pre>
+<p>You should see: no output on Linux and macOS. <code>crontab -l</code> no longer lists <code>driftwood run</code>.</p>
+</li>
+<li id="undo-restore">
+<h3 id="restore-a-rotated-file">Restore a rotated file</h3>
+<p>This writes Generation 1 to a new file and never overwrites <code>app.log</code>. Add <code>--generation N</code> for an older one.</p>
+<pre><code>cd /var/log/app
+driftwood restore app.log</code></pre>
+<p>You should see:</p>
+<pre><code>restored app.log.1.gz -&gt; app.log.restored</code></pre>
+<p>To go back to the state before step 5, copy the backup over the folder: <code>cp -a /var/log/app.bak/. /var/log/app/</code> on Linux and macOS, or <code>Copy-Item C:\logs\app.bak\* C:\logs\app -Recurse -Force</code> on Windows.</p>
+</li>
+<li id="undo-config">
+<h3 id="remove-the-config">Remove the config</h3>
+<pre><code>rm /var/log/app/driftwood.toml</code></pre>
+<p>You should see: no output. <code>driftwood check</code> now prints <code>error: config not found</code> (F1), which confirms the config is gone.</p>
+</li>
+</ol>
+</section>
+
+<section id="related">
+<h2 id="related-pages">Related</h2>
+<p>In a multi-tab artifact these lines are links to the exact entries.</p>
+<ul>
+<li>Reference: the options <code>keep</code>, <code>compress</code>, <code>max_size</code> and <code>schedule</code>, and the exit codes of <code>driftwood run</code>.</li>
+<li>Explanation: why Driftwood rotates by size and by time.</li>
+</ul>
+</section>
+
+<section id="glossary">
+<h2 id="glossary-title">Glossary</h2>
+<dl class="glossary">
+<dt class="defterm">Archive</dt><dd>The set of compressed Generations kept for one Live log.</dd>
+<dt class="defterm">Generation</dt><dd>A numbered Archive copy of a Live log, such as <code>app.log.1.gz</code>. Generation 1 is the newest.</dd>
+<dt class="defterm" data-aliases="live logs">Live log</dt><dd>A log file that an application still writes to, <code>app.log</code> in this guide.</dd>
+<dt class="defterm">Lock file</dt><dd>The file <code>.driftwood/lock</code>, which stops two runs from rotating at once.</dd>
+<dt class="defterm" data-aliases="rotate, rotated">Rotation</dt><dd>The act of renaming a Live log to Generation 1 and starting an empty Live log.</dd>
+</dl>
+<h3 id="abbreviations" data-nomenu>Abbreviations</h3>
+<table data-abbr>
+<thead><tr><th>Abbreviation</th><th>Expansion</th></tr></thead>
+<tbody>
+<tr><td>TOML</td><td>Tom's Obvious Minimal Language</td></tr>
+</tbody>
+</table>
+</section>
+
+<footer class="pagefoot">
+<span>As of 2026-11-01 · Revision 1</span>
+<span>Sample content about a fictional tool. Owner: docs maintainer. Report a wrong step to the owner.</span>
+<a href="#top">Back to top</a>
+</footer>
+
+</main>
+</div>
+</div>
+
+<script>
+// reader.js
+// /reader.js
+</script>

@@ -1,9 +1,6 @@
 ---
-level: persona
-metadata:
-  level: persona
 name: humanize-heavy
-description: Heavy mode of humanize. Iteratively rewrite a text until it passes a deterministic AI-tell scorer plus three context-free AI-detection agents; output stays in the input language. Use only when the user asks for the heavy, full or scored version ("humanize pesada", "heavy humanize", "with the scorer", "does this sound AI-written?") or a calling skill requires the scored pipeline. The default, unscored pass is the `humanize` skill.
+description: Heavy mode of humanize. Iteratively rewrite a text until it passes a deterministic AI-tell scorer plus three context-free AI-detection agents; output stays in the input language. Use only when the user asks for the heavy, full or scored version ("heavy humanize", "with the scorer", "does this sound AI-written?") or a calling skill requires the scored pipeline. The default, unscored pass is the `humanize` skill.
 ---
 
 # Humanize (heavy)
@@ -38,14 +35,14 @@ Save the candidate to `<scratchpad>/humanize/candidate.md` so both the script an
 Run:
 
 ```bash
-python3 <skill-dir>/scripts/ai_tells.py <scratchpad>/humanize/candidate.md
+python <skill-dir>/scripts/ai_tells.py <scratchpad>/humanize/candidate.md
 ```
 
-The JSON output gives `script_score` (0–60), per-check points, and rewrite `advice` for each failed check. Rewrite targeting exactly the failed checks (see "Rewriting rules"), save, re-run. Iterate until `script_score ≥ 50` or 5 iterations. This phase is free and instant — never spawn agents for it.
+The scorer's lexical lists are English-only. For other languages, including Portuguese, the lexical score is incomplete and cannot establish the full pass bar; report this limitation and use a language-appropriate manual review. The JSON output gives `script_score` (0–60), per-check points, and rewrite `advice` for each failed check. Rewrite targeting exactly the failed checks (see "Rewriting rules"), save, re-run. Iterate until `script_score ≥ 50` or 5 iterations. This phase is free and instant — never spawn agents for it.
 
 ## Phase 2 — agent rubric (3 parallel agents, majority vote)
 
-Launch **three agents in a single message** (subagent_type `general-purpose`, run_in_background false). Identical prompts — determinism comes from binary questions plus majority voting, not from varied personas:
+When three independent subagents are authorized and available, launch them together using the active harness interface. If fewer than three eligible independent evaluators are available or return valid votes, report the agent rubric and combined score as not measured; do not claim a pass. Identical prompts — determinism comes from binary questions plus majority voting, not from varied personas:
 
 ```
 Read the file <path>. For each check below answer strictly true or false about

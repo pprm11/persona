@@ -1,0 +1,329 @@
+<!-- Fictional worked example; do not treat sample facts as real. -->
+<title>Why Driftwood rotates on size and time</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Tokens: light by default; dark follows the system unless the host forces a theme. Every color below comes from a token. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --fg: #1b2230; --muted: #5a6475; --line: #dde1e8;
+  --accent: #2c4f9e; --accent-soft: #e6ecf8; --on-accent: #ffffff;
+  --warn: #8a5a00; --warn-soft: #fbf1dc; --ok: #1f6b45; --ok-soft: #e1f2e8; --code-bg: #eef0f4;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark }
+/* Print always uses the light tokens (same specificity as the dark rules above, declared later). */
+@media print { :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+  --bg: #ffffff; --surface: #ffffff; --fg: #111111; --muted: #444444; --line: #bbbbbb;
+  --accent: #1d3f86; --accent-soft: #eef2fb; --on-accent: #ffffff;
+  --warn: #6b4500; --warn-soft: #fbf1dc; --ok: #14502f; --ok-soft: #e1f2e8; --code-bg: #f1f1f1; color-scheme: light } }
+
+/* Base */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--f-body); }
+main h1 { font: 600 clamp(27px, 5vw, 34px)/1.15 var(--f-display); margin: 0 0 10px; text-wrap: balance; }
+main h2 { font: 600 26px/1.2 var(--f-display); margin: 40px 0 12px; text-wrap: balance; }
+main h3 { font: 600 20px/1.3 var(--f-display); margin: 30px 0 8px; text-wrap: balance; }
+main h4 { font: 600 16px var(--f-display); margin: 22px 0 6px; }
+main p, main li, main dd { max-width: 78ch; overflow-wrap: anywhere; }
+main a { color: var(--accent); }
+code { font: 0.86em var(--f-mono); background: var(--code-bg); border-radius: 3px; padding: 1px 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--f-mono); margin: 12px 0; }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
+blockquote { margin: 12px 0; padding: 4px 14px; border-left: 3px solid var(--line); color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+.eyebrow { font: 500 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.meta { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+
+/* Header and the In one minute slot */
+header.top { margin-bottom: 8px; }
+.oneminute { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 4px 18px 12px; margin: 16px 0 0; }
+.oneminute h2 { font-size: 18px; margin: 12px 0 6px; }
+
+/* Overview cards (optional) */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; margin: 24px 0 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; }
+main a.card { color: inherit; }
+.card:hover, .card:focus-visible { border-color: var(--accent); }
+.card .k { font: 500 12px var(--f-mono); color: var(--accent); letter-spacing: .04em; }
+.card .t { font: 600 16px/1.25 var(--f-display); }
+.card .d { font-size: 13px; color: var(--muted); flex: 1; }
+.card .f { font: 12px var(--f-mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 6px; }
+
+/* Callouts and chips: the label carries the meaning, color only reinforces it */
+.callout { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px 16px; margin: 14px 0; }
+.callout > :first-child { margin-top: 0; } .callout > :last-child { margin-bottom: 0; }
+.callout--warn { background: var(--warn-soft); border-left-color: var(--warn); }
+.callout--ok { background: var(--ok-soft); border-left-color: var(--ok); }
+.callout .label { font: 600 13px var(--f-display); letter-spacing: .03em; text-transform: uppercase; color: var(--accent); }
+.callout--warn .label { color: var(--warn); } .callout--ok .label { color: var(--ok); }
+.chip { display: inline-block; font: 600 12px var(--f-mono); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.chip--ok { background: var(--ok-soft); color: var(--ok); } .chip--warn { background: var(--warn-soft); color: var(--warn); }
+.chip--muted { background: var(--code-bg); color: var(--muted); }
+
+/* Numbered steps (tutorial and how-to) */
+ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 16px 0; display: grid; gap: 14px; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 4px 14px; max-width: none; }
+ol.steps > li::before { content: counter(step); grid-row: 1 / span 3; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+  font: 600 15px var(--f-display); color: var(--accent); background: var(--accent-soft); }
+ol.steps > li > * { grid-column: 2; min-width: 0; margin-top: 0; margin-bottom: 0; }
+
+/* Decisions and open questions (optional block) */
+.asks { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 20px 20px; margin: 32px 0; }
+.asks h2 { margin-top: 12px; }
+.asks-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
+.asks-col { min-width: 0; }
+.asks-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--accent); padding-bottom: 6px; margin-bottom: 10px; }
+.asks-head h3 { margin: 0; font-size: 18px; }
+.asks ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; }
+.asks .q { font-weight: 600; }
+.asks .a { display: block; color: var(--muted); font-size: 14px; }
+
+/* Glossary (feeds the term popovers) */
+dl.glossary { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); gap: 0 20px; margin: 12px 0; }
+dl.glossary dt { padding: 8px 0; border-top: 1px solid var(--line); }
+dl.glossary dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--line); max-width: none; }
+
+/* Footer */
+footer.pagefoot { border-top: 1px solid var(--line); margin-top: 56px; padding-top: 16px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+
+@media (max-width: 960px) { .asks-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { dl.glossary { grid-template-columns: minmax(0, 1fr); } dl.glossary dt { padding-bottom: 0; } dl.glossary dd { border-top: 0; padding-top: 2px; } }
+@media print { .oneminute, .asks, .card { break-inside: avoid; } }
+
+/* reader.css */
+/* /reader.css */
+</style>
+
+<div class="reader-root" lang="en">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+
+<nav class="index" id="contents" aria-label="Contents">
+<button class="searchbtn" type="button" id="searchbtn">Search  ( / or Ctrl+K )</button>
+</nav>
+
+<main id="main" data-reader="all" data-id-prefixes="G,L,Q,D,ADR-">
+
+<header class="top" id="top">
+<p class="eyebrow">Driftwood 2.4.0 · Explanation · Sample content</p>
+<h1>Why Driftwood rotates on size and time</h1>
+<section class="oneminute" aria-labelledby="one-minute">
+<h2 id="one-minute" data-nomenu>In one minute</h2>
+<p>This page answers one question: why does Driftwood rotate a Live log when it is above <code>max_size</code> or when the <code>schedule</code> time is reached, and not on time alone? The answer is that a time-only rule lets a file grow by the write rate times the whole period, while the size rule caps growth at <code>max_size</code> plus one check interval of writes. The price is that Generation names carry a number instead of a calendar period (L1). In the sample figures below, a daily schedule allows up to 216 GB in one file and the size rule allows about 200 MB. We ask the maintainers to review ADR-1. Two questions are open: Q1 with the config format owner and Q2 with the release owner.</p>
+</section>
+<p class="meta">As of 2026-11-01 · Revision 2 · Owner: Driftwood maintainers · Sample content, not a real product</p>
+</header>
+
+<section aria-labelledby="changed-title">
+<h2 id="changed-title" data-nomenu>What changed in revision 2</h2>
+<ul>
+<li>Added the sequence figure for a burst and the overshoot formula (G1, L2).</li>
+<li>Added L3 after review found the rename window. Raised Q2.</li>
+<li>ADR-1 moved from Proposed to Accepted. Q1 stays open.</li>
+</ul>
+</section>
+
+<section id="conventions" aria-labelledby="conv-title">
+<h2 id="conv-title" data-nomenu>Conventions</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Prefix</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>G</code></td><td>Goal of the design</td></tr>
+<tr><td><code>L</code></td><td>Accepted limit</td></tr>
+<tr><td><code>Q</code></td><td>Open question with an owner</td></tr>
+<tr><td><code>D</code></td><td>Decision taken</td></tr>
+<tr><td><code>ADR-</code></td><td>Architecture decision record</td></tr>
+</tbody></table></div>
+<p>Tags: <code>[SAMPLE]</code> marks an invented value for this fictional tool. <code>[RUN]</code> marks output copied from a command. All figures on this page are samples.</p>
+</section>
+
+<section id="context" aria-labelledby="context-title">
+<h2 id="context-title">Logs grow in bursts, not on a calendar</h2>
+<p>A service that writes a few kilobytes an hour can write megabytes per second for a few minutes when it retries a failing dependency. A rotation rule that only looks at the clock cannot see that difference. This page explains the rule the Driftwood 2.4.0 <abbr>CLI</abbr> uses instead. Its settings live in a <abbr>TOML</abbr> file, <code>driftwood.toml</code>. The page does not explain how to configure the rule or list every option.</p>
+<p>Two goals and no more drive the design. Each has a name so later sections can cite it.</p>
+<ul>
+<li><span class="defid" id="def-G1">G1</span>. Bounded disk use. No single log file may fill the volume between two rotations.</li>
+<li><span class="defid" id="def-G2">G2</span>. Predictable retention. The <code>keep</code> option counts Generations, so the number of files on disk stays fixed.</li>
+</ul>
+<p>Interpretation, not measurement: we read G1 as the more important goal because a full volume stops the service, while an odd file name only costs a reader some time. Nothing on this page proves that ranking for every team.</p>
+</section>
+
+<section id="mechanism" aria-labelledby="mech-title">
+<h2 id="mech-title">Two triggers share one check, so the earlier one wins</h2>
+<p>Your scheduler calls <code>driftwood run</code> every minute <code>[SAMPLE]</code>. Each call asks two questions about every configured file. If the Live log is above <code>max_size</code> the Size trigger fires. If the <code>schedule</code> time is reached the Time trigger fires. Either one rotates the file, and the first to fire wins because rotation resets both.</p>
+<p><strong>Figure: Rotation decision.</strong> Follow the arrows from the scheduler call to the end of a run; both diamonds lead to the same Rotation (Legend: rounded blue is outside Driftwood, amber diamond is a trigger check, green rectangle is an action, dashed grey is no action).</p>
+<div class="diagram"><pre class="mermaid">
+%%{init: {"flowchart": {"nodeSpacing": 22, "rankSpacing": 30, "padding": 6, "diagramPadding": 4}}}%%
+flowchart TB
+accTitle: Rotation decision in one run
+accDescr: The scheduler calls driftwood run. If the file is above max_size or the schedule time is reached, Driftwood rotates it, compresses the Generation unless compress is none, then deletes Generations beyond keep. Otherwise the file is left as it is.
+tick(["Scheduler calls<br/>driftwood run"]):::ext
+size{"Size above<br/>max_size?"}:::trig
+due{"Schedule time<br/>reached?"}:::trig
+skip["Leave file as is"]:::idle
+rot["Rotate file"]:::act
+comp{"compress is not<br/>none?"}:::trig
+gz["Compress Generation"]:::act
+prune["Delete Generations<br/>beyond keep"]:::act
+tick --> size
+size -- yes --> rot
+size -- no --> due
+due -- yes --> rot
+due -- no --> skip
+rot --> comp
+comp -- yes --> gz
+comp -- no --> prune
+gz --> prune
+classDef ext fill:#c9d8f5,stroke:#2c4f9e,color:#111111,stroke-width:2px
+classDef trig fill:#f6dd9a,stroke:#8a5a00,color:#111111,stroke-width:2px
+classDef act fill:#b9e3cb,stroke:#1f6b45,color:#111111,stroke-width:2px
+classDef idle fill:#dfe3ea,stroke:#5a6475,color:#111111,stroke-width:2px,stroke-dasharray:5 3
+</pre>
+<details class="figtext"><summary>Text version</summary>
+<p>Edges: scheduler call to size check. Size check yes goes to rotate; no goes to schedule check. Schedule check yes goes to rotate; no goes to leave the file as it is. Rotate goes to the compress check. Compress yes goes to compress Generation, then to delete Generations beyond keep. Compress no goes straight to delete Generations beyond keep.</p>
+</details></div>
+<p>The size trigger matters because of how far a file can grow before the next Rotation. With a write rate <em>r</em>, a schedule period <em>P</em> and a check interval <em>c</em>, the worst-case file size is:</p>
+<ul>
+<li>Time only: <em>r</em> × <em>P</em>.</li>
+<li>Size and time: <code>max_size</code> + <em>r</em> × <em>c</em>.</li>
+</ul>
+<p>Recompute with the sample inputs <em>r</em> = 2.5 MB/s, <em>P</em> = 86400 s (daily) and <em>c</em> = 60 s, <code>max_size = "50MB"</code> <code>[SAMPLE]</code>:</p>
+<pre><code>$ python -c "print(2.5*86400/1000, 'GB', 50+2.5*60, 'MB')"
+216.0 GB 200.0 MB</code></pre>
+<p>The same 2.5 MB/s burst under the size rule looks like this over time. The overshoot is one check interval of writes, so it does not depend on the schedule.</p>
+<p><strong>Figure: A Burst under the Size trigger.</strong> Read top to bottom; the rotation happens at the first check after the file crosses the limit (Legend: solid arrow is a call, dashed arrow is a reply).</p>
+<div class="diagram"><pre class="mermaid">
+sequenceDiagram
+autonumber
+accTitle: A write burst handled by the size trigger
+accDescr: A service writes a burst. Driftwood checks the file size every minute. Once the size is above max_size at a check, Driftwood rotates the file and a new file starts. The overshoot is at most the writes of one check interval.
+participant S as Service
+participant D as Log file
+participant W as driftwood run
+S->>D: Burst of writes
+W->>D: Check size
+D-->>W: Below max_size
+S->>D: Writes continue
+W->>D: Check size
+D-->>W: Above max_size
+W->>D: Rotate, start new file
+Note over S,W: Overshoot is at most one check interval of writes
+</pre></div>
+<p>To see which Live logs are due right now, run <code>driftwood check</code>. The output below is a sample <code>[SAMPLE]</code>.</p>
+<pre><code>$ driftwood check
+config: ./driftwood.toml ok
+due  /var/log/app/app.log     62MB &gt; max_size 50MB
+ok   /var/log/app/worker.log   4MB
+1 file due</code></pre>
+<p>The exact options, defaults and allowed values are in the Reference tab of the full artifact, and the steps to change them are in the How-to tab. This sample shows the Explanation tab alone, so those links are omitted.</p>
+</section>
+
+<section id="alternatives" aria-labelledby="alt-title">
+<h2 id="alt-title">A shorter time-only schedule still loses to the burst</h2>
+<p>Four ways to bound disk use were compared against G1 and G2. The table gives the final verdict for each.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Option</th><th>What it gives</th><th>What it costs</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Do nothing, leave rotation to each application</td><td>No new tool</td><td>Every service rotates differently and many do not at all</td><td>Loses on G1 and G2</td></tr>
+<tr><td>Time only, short period</td><td>Calendar names, simplest rule</td><td>The period must be tuned to the worst burst, and a file still grows by <em>r</em> × <em>P</em></td><td>Strongest alternative, loses on G1</td></tr>
+<tr><td>Size only</td><td>Hard cap on file size</td><td>A quiet service never rotates, so old lines never reach <code>compress</code> or <code>keep</code></td><td>Loses on G2</td></tr>
+<tr><td>Size and time, whichever first</td><td>Cap on size and a bound on age</td><td>Generation names carry a number, not a period (L1)</td><td>Chosen</td></tr>
+</tbody></table></div>
+<p>The strongest alternative is time only with a short period, because it keeps names predictable and needs one rule. It loses because its bound depends on guessing the worst burst: a 5 minute period still allows <em>r</em> × 300 s = 750 MB at the sample rate, and a quiet hour pays the cost of a Rotation it did not need. The size trigger bounds the file by volume, whatever the period. Time only does win on one point: names. A reader who wants "the log for Tuesday" finds it directly under a time-only rule and has to check file times under ours.</p>
+</section>
+
+<section id="tradeoffs" aria-labelledby="trade-title">
+<h2 id="trade-title">The price is paid by people who search archives by date</h2>
+<p>Positive consequences go to the operator on call, who no longer sees a full volume from logs. Negative consequences go to whoever reads Generations later. Three limits are accepted.</p>
+<ul>
+<li><span class="defid" id="def-L1">L1</span>. Numbered names. A Generation name carries a number, not a calendar period, so a day may span several Generations.</li>
+<li><span class="defid" id="def-L2">L2</span>. Check granularity. A Live log can exceed <code>max_size</code> by one Check interval of writes, the Overshoot. Lowering the interval lowers the overshoot and raises the number of runs.</li>
+<li><span class="defid" id="def-L3">L3</span>. Rename window. Rotation renames the Live log, and the application keeps writing to the renamed file until it reopens its log, so lines can land in Generation 1 after the Rotation <code>[SAMPLE]</code>. A service that reopens its log on a signal avoids it.</li>
+</ul>
+<p>Two cases show where the claim stops holding. A service that writes one line a day never reaches <code>max_size</code>, so only the Time trigger acts and the size rule is irrelevant for it. A file Driftwood cannot read ends the run with <code>error: permission denied on /var/log/app</code>, and then neither trigger can act, so G1 is not met until the permission is fixed.</p>
+<div class="callout callout--warn"><p><span class="label">Limit</span></p><p>The bound in G1 holds only while <code>driftwood run</code> is actually called. If the scheduler stops, both triggers stop.</p></div>
+</section>
+
+<section id="adr" aria-labelledby="adr-title">
+<h2 id="adr-title">ADR-1 records the choice of two triggers</h2>
+<p><span class="defid" id="def-ADR-1">ADR-1</span>. Rotate on size and on time.</p>
+<p>Status: Accepted · Date: 2026-10-28 · Decided by: Driftwood maintainers · Supersedes: none <code>[SAMPLE]</code></p>
+<p>The record follows the <abbr>ADR</abbr> shape: context, decision, options, consequences, revisit condition.</p>
+<ul>
+<li><strong>Context.</strong> A burst of 2.5 MB/s fills 216 GB in one day under a daily rule <code>[SAMPLE]</code>. Goals G1 and G2 apply.</li>
+<li><strong>Decision.</strong> We will rotate a file when it reaches <code>max_size</code> or when its <code>schedule</code> is due, whichever comes first.</li>
+<li><strong>Options.</strong> Compared in the alternatives table: do nothing, time only, size only, size and time.</li>
+<li><strong>Consequences.</strong> Positive: bounded files, fixed Generation count. Negative: L1, L2, L3.</li>
+<li><strong>Revisit when.</strong> <code>driftwood run</code> can react to file growth without a scheduler, or when a release changes how the Live log is renamed.</li>
+</ul>
+</section>
+
+<section class="asks" id="asks" aria-labelledby="asks-title">
+<h2 id="asks-title">Decisions and open questions</h2>
+<div class="asks-grid">
+<div class="asks-col" id="decided">
+<div class="asks-head"><h3>Decided</h3></div>
+<ol>
+<li><span class="q"><span class="defid" id="def-D1">D1</span>. Two triggers</span><span class="a">Accepted in ADR-1. Team decision, 2026-10-28.</span></li>
+<li><span class="q"><span class="defid" id="def-D2">D2</span>. Numbered names</span><span class="a">Accepted as L1. Calendar names are not planned.</span></li>
+</ol>
+</div>
+<div class="asks-col" id="open">
+<div class="asks-head"><h3>Still open</h3><button class="copy" type="button" data-target="open-list" data-label="Copy">Copy</button></div>
+<ol id="open-list">
+<li><span class="q"><span class="defid" id="def-Q1">Q1</span>. Should <code>max_size</code> accept a share of free disk?</span><span class="a">Owner: config format owner. If yes, <code>driftwood.toml</code> gains a second unit and L2 changes. If no, the section on triggers stays.</span><span class="tag">Q1</span></li>
+<li><span class="q"><span class="defid" id="def-Q2">Q2</span>. Should the default <code>max_size</code> be lower?</span><span class="a">Owner: release owner. If yes, small services rotate more often and Generations get smaller. If no, nothing changes.</span><span class="tag">Q2</span></li>
+</ol>
+</div>
+</div>
+</section>
+
+<section id="glossary">
+<h2>Glossary</h2>
+<p>Terms are defined once and linked on first use in each paragraph. Version 1, 2026-11-01.</p>
+<dl class="glossary">
+<dt class="defterm">Archive</dt><dd>The set of compressed Generations kept for one Live log.</dd>
+<dt class="defterm">Burst</dt><dd>A short period in which a service writes far above its normal rate, for example while it retries a failing call.</dd>
+<dt class="defterm">Check interval</dt><dd>The time between two calls of <code>driftwood run</code>, set by your scheduler, not by Driftwood.</dd>
+<dt class="defterm">Generation</dt><dd>A numbered Archive copy of a Live log. Generation 1 is the newest.</dd>
+<dt class="defterm" data-aliases="live logs">Live log</dt><dd>A log file that an application still writes to.</dd>
+<dt class="defterm">Overshoot</dt><dd>The amount by which a Live log exceeds <code>max_size</code> before a check notices; at most one Check interval of writes.</dd>
+<dt class="defterm" data-aliases="rotate, rotated">Rotation</dt><dd>The act of renaming a Live log to Generation 1 and starting an empty Live log. Compression and deletion follow it but are not part of it.</dd>
+<dt class="defterm">Size trigger</dt><dd>The Trigger that fires when a Live log is above <code>max_size</code>.</dd>
+<dt class="defterm">Time trigger</dt><dd>The Trigger that fires when the <code>schedule</code> time is reached, whatever the file size.</dd>
+<dt class="defterm">Trigger</dt><dd>A condition that makes a Live log due: size above <code>max_size</code>, or the <code>schedule</code> time reached. Driftwood has two, the Size trigger and the Time trigger.</dd>
+</dl>
+<h3 id="abbreviations">Abbreviations</h3>
+<div class="tablewrap"><table data-abbr>
+<thead><tr><th>Abbreviation</th><th>Expansion</th></tr></thead>
+<tbody>
+<tr><td>ADR</td><td>Architecture decision record</td></tr>
+<tr><td>TOML</td><td>Tom's Obvious Minimal Language</td></tr>
+<tr><td>CLI</td><td>Command-line interface</td></tr>
+</tbody></table></div>
+</section>
+<footer class="pagefoot">
+<span>As of 2026-11-01 · Revision 2</span>
+<span>Sample content about a fictional tool. Scope: why rotation uses two triggers. Owner: Driftwood maintainers. Report an error to the maintainers.</span>
+<a href="#top">Back to top</a>
+</footer>
+
+</main>
+</div>
+</div>
+
+<script>
+// reader.js
+// /reader.js
+</script>

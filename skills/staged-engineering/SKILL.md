@@ -1,6 +1,5 @@
 ---
 name: staged-engineering
-level: persona
 description: "Drive a traceable six-stage engineering design series: problem domain and as-is, market study, solution domain, HLA with ADRs, then HLD. Use for RFC to HLA to HLD work, a design series with traceability, or cascading revisions when an earlier stage changes."
 ---
 
@@ -12,7 +11,7 @@ Terms: **stage** (one document of the series), **source** (the previous stage pl
 
 This skill covers the connected design series and its traceability. If your organization has its own procedure for this, follow that and use this one as the generic fallback, or when the user asks for it. Keep any safety and authorization rules that apply. For a single team RFC, use your RFC skill if you have one. When an RFC is one stage of a series, use both and keep the stage contract.
 
-This skill owns the genre: which documents the series has and what each must contain. For writing, building and checking each document (type per part, reader page, linking, diagrams, the three gates), use an `artifact-routing` skill (writing, page build and check scripts; not bundled here, bring your own): pass it this skill's stage brief and return its routing line. Do not call it back from there.
+This skill owns the genre: which documents the series has and what each must contain. For writing, building and checking each document (type per part, reader page, linking, diagrams, the three gates), use `artifact-routing` if installed: pass it this skill's stage brief and return its routing line. Otherwise classify the reader need, check sources and accessibility, and build the requested medium using available tools. Do not call this skill back from there.
 
 ## The 6 stages
 
@@ -35,7 +34,7 @@ Every stage, including the test plan (stage 7), passes three gates before it clo
 - **Correct**: it does what is needed, including when something fails. Evidence: a counterexample, a recalculation, a POC with a negative control, official documentation, a second opinion from another model.
 - **Optimized**: the simplest and cheapest way that gives the same guarantees, with the numbers before and after.
 
-`artifact-routing` runs the gates; the stage-specific criteria, the pass rule and how to run them with several agents are in `references/quality-gates.md`. The brief for the correctness gate is in `references/correctness-brief.md`.
+Apply the gates directly if `artifact-routing` is unavailable; the stage-specific criteria, the pass rule and how to run them with several agents are in `references/quality-gates.md`. The brief for the correctness gate is in `references/correctness-brief.md`.
 
 ## Rules that apply in every stage
 
@@ -67,7 +66,7 @@ They are in `references/cross-cutting.md`. The ones that broke most often in the
    - the cost covers the topology of the Deployment section, line by line;
    - no cited command prints a secret value.
 7. **Verify** with the `artifact-routing` checks (`preserve.py` if the text was rewritten, `permalinks.py --check`, `privacy_scan.py`, and the page build with no broken anchor and no ID without a definition). The build runs locally even when publishing is not allowed.
-8. **Publish** (only with the user's word, or when they asked for an artifact): one page with the stages in order, built by `artifact-routing` (`reader-page.md`). The series supplies the order, the stage cards and the ID prefixes.
+8. **Publish** (only when the user authorizes publication): one page with the stages in order, built by `artifact-routing` (`reader-page.md`). The series supplies the order, the stage cards and the ID prefixes.
 
 ## When the source changes: cascade
 
@@ -86,10 +85,10 @@ Use a cheap model for mechanical checks, a mid-tier model to read and write one 
 
 ## Diagrams, page and scripts
 
-Diagram rules, the published page, linking and the check scripts (`permalinks.py`, `preserve.py`, `privacy_scan.py`, `check.mjs`, `build_page.py`) belong to the `artifact-routing` skill, which is not bundled here. Without it, run the same checks by hand or with your own scripts. This skill keeps no scripts or page assets.
+Diagram rules, the published page, linking and the check scripts (`permalinks.py`, `preserve.py`, `privacy_scan.py`, `check.mjs`, `build_page.py`) belong to the `artifact-routing` skill, which may be installed separately. Without it, run the same checks by hand or with your own scripts. This skill keeps no scripts or page assets.
 
 ## Related
 
-- `artifact-routing` (not bundled): how each document is written, built and checked.
+- `artifact-routing` (optional): how each document is written, built and checked.
 - A humanize or de-AI writing skill, for text that does not read as machine-written.
 - A task-card skill, for the tasks that follow the HLD.

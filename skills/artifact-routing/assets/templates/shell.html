@@ -1,0 +1,186 @@
+<title>{{TITLE}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Tokens: light by default; dark follows the system unless the host forces a theme. Every color below comes from a token. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --fg: #1b2230; --muted: #5a6475; --line: #dde1e8;
+  --accent: #2c4f9e; --accent-soft: #e6ecf8; --on-accent: #ffffff;
+  --warn: #8a5a00; --warn-soft: #fbf1dc; --ok: #1f6b45; --ok-soft: #e1f2e8; --code-bg: #eef0f4;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark }
+/* Print always uses the light tokens (same specificity as the dark rules above, declared later). */
+@media print { :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+  --bg: #ffffff; --surface: #ffffff; --fg: #111111; --muted: #444444; --line: #bbbbbb;
+  --accent: #1d3f86; --accent-soft: #eef2fb; --on-accent: #ffffff;
+  --warn: #6b4500; --warn-soft: #fbf1dc; --ok: #14502f; --ok-soft: #e1f2e8; --code-bg: #f1f1f1; color-scheme: light } }
+
+/* Base */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--f-body); }
+main h1 { font: 600 clamp(27px, 5vw, 34px)/1.15 var(--f-display); margin: 0 0 10px; text-wrap: balance; }
+main h2 { font: 600 26px/1.2 var(--f-display); margin: 40px 0 12px; text-wrap: balance; }
+main h3 { font: 600 20px/1.3 var(--f-display); margin: 30px 0 8px; text-wrap: balance; }
+main h4 { font: 600 16px var(--f-display); margin: 22px 0 6px; }
+main p, main li, main dd { max-width: 78ch; overflow-wrap: anywhere; }
+main a { color: var(--accent); }
+code { font: 0.86em var(--f-mono); background: var(--code-bg); border-radius: 3px; padding: 1px 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--f-mono); margin: 12px 0; }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
+blockquote { margin: 12px 0; padding: 4px 14px; border-left: 3px solid var(--line); color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+.eyebrow { font: 500 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.meta { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+
+/* Header and the In one minute slot */
+header.top { margin-bottom: 8px; }
+.oneminute { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 4px 18px 12px; margin: 16px 0 0; }
+.oneminute h2 { font-size: 18px; margin: 12px 0 6px; }
+
+/* Overview cards (optional) */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; margin: 24px 0 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; }
+main a.card { color: inherit; }
+.card:hover, .card:focus-visible { border-color: var(--accent); }
+.card .k { font: 500 12px var(--f-mono); color: var(--accent); letter-spacing: .04em; }
+.card .t { font: 600 16px/1.25 var(--f-display); }
+.card .d { font-size: 13px; color: var(--muted); flex: 1; }
+.card .f { font: 12px var(--f-mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 6px; }
+
+/* Callouts and chips: the label carries the meaning, color only reinforces it */
+.callout { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px 16px; margin: 14px 0; }
+.callout > :first-child { margin-top: 0; } .callout > :last-child { margin-bottom: 0; }
+.callout--warn { background: var(--warn-soft); border-left-color: var(--warn); }
+.callout--ok { background: var(--ok-soft); border-left-color: var(--ok); }
+.callout .label { font: 600 13px var(--f-display); letter-spacing: .03em; text-transform: uppercase; color: var(--accent); }
+.callout--warn .label { color: var(--warn); } .callout--ok .label { color: var(--ok); }
+.chip { display: inline-block; font: 600 12px var(--f-mono); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.chip--ok { background: var(--ok-soft); color: var(--ok); } .chip--warn { background: var(--warn-soft); color: var(--warn); }
+.chip--muted { background: var(--code-bg); color: var(--muted); }
+
+/* Numbered steps (tutorial and how-to) */
+ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 16px 0; display: grid; gap: 14px; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 4px 14px; max-width: none; }
+ol.steps > li::before { content: counter(step); grid-row: 1 / span 3; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+  font: 600 15px var(--f-display); color: var(--accent); background: var(--accent-soft); }
+ol.steps > li > * { grid-column: 2; min-width: 0; margin-top: 0; margin-bottom: 0; }
+
+/* Decisions and open questions (optional block) */
+.asks { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 20px 20px; margin: 32px 0; }
+.asks h2 { margin-top: 12px; }
+.asks-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
+.asks-col { min-width: 0; }
+.asks-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--accent); padding-bottom: 6px; margin-bottom: 10px; }
+.asks-head h3 { margin: 0; font-size: 18px; }
+.asks ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; }
+.asks .q { font-weight: 600; }
+.asks .a { display: block; color: var(--muted); font-size: 14px; }
+
+/* Glossary (feeds the term popovers) */
+dl.glossary { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); gap: 0 20px; margin: 12px 0; }
+dl.glossary dt { padding: 8px 0; border-top: 1px solid var(--line); }
+dl.glossary dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--line); max-width: none; }
+
+/* Footer */
+footer.pagefoot { border-top: 1px solid var(--line); margin-top: 56px; padding-top: 16px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+
+@media (max-width: 960px) { .asks-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { dl.glossary { grid-template-columns: minmax(0, 1fr); } dl.glossary dt { padding-bottom: 0; } dl.glossary dd { border-top: 0; padding-top: 2px; } }
+@media print { .oneminute, .asks, .card { break-inside: avoid; } }
+
+/* reader.css */
+/* /reader.css */
+</style>
+
+<div class="reader-root" lang="{{LANG}}">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+
+<nav class="index" id="contents" aria-label="Contents">
+<button class="searchbtn" type="button" id="searchbtn">Search  ( / or Ctrl+K )</button>
+<!-- The reader builds the filter box and the list from the h2 and h3 headings. To write the list by hand, add a <ul> here. -->
+</nav>
+
+<main id="main" data-reader="all" data-id-prefixes="{{ID_PREFIXES}}">
+
+<header class="top" id="top">
+<p class="eyebrow">{{EYEBROW}}</p>
+<h1>{{TITLE}}</h1>
+<section class="oneminute" aria-labelledby="one-minute">
+<h2 id="one-minute" data-nomenu>In one minute</h2>
+{{ONE_MINUTE}}
+</section>
+<p class="meta">As of {{AS_OF}} · Revision {{REVISION}}{{META}}</p>
+</header>
+
+<!-- Optional overview cards. One a.card per part; the footer line says what changed or where to start. -->
+<div class="cards">
+<a class="card" href="#{{CARD_TARGET}}"><span class="k">{{CARD_KICKER}}</span><span class="t">{{CARD_TITLE}}</span><span class="d">{{CARD_TEXT}}</span><span class="f">{{CARD_FOOTER}}</span></a>
+</div>
+
+<!-- Optional tabs: one tab per Diataxis type, one role=tabpanel each. The bar keeps the order Tutorial, How-to, Reference, Explanation; the default tab (the reader's main job) is the one with aria-selected="true" and no hidden on its panel. Remove the bar and keep one panel for a single-type page. -->
+<div class="tabs" role="tablist" aria-label="{{TABS_LABEL}}">
+<button type="button" role="tab" id="tab-{{TAB_ID}}" aria-controls="{{TAB_ID}}" aria-selected="true">{{TAB_LABEL}}</button>
+<button type="button" role="tab" id="tab-{{TAB_ID_2}}" aria-controls="{{TAB_ID_2}}" aria-selected="false">{{TAB_LABEL_2}}</button>
+</div>
+
+<div id="{{TAB_ID}}" role="tabpanel" aria-labelledby="tab-{{TAB_ID}}">
+{{PANEL_CONTENT}}
+</div>
+<div id="{{TAB_ID_2}}" role="tabpanel" aria-labelledby="tab-{{TAB_ID_2}}" hidden>
+{{PANEL_CONTENT_2}}
+</div>
+
+<!-- Optional glossary. Put it inside the panel it belongs to when the page has tabs. The build writes id term-<slug> on each dt.defterm and links each term once per paragraph. Optional data-aliases="a, b" on a dt. -->
+<section id="glossary">
+<h2>Glossary</h2>
+<dl class="glossary">
+<dt class="defterm">{{TERM}}</dt><dd>{{TERM_DEFINITION}}</dd>
+</dl>
+</section>
+
+<!-- Optional decisions and open questions. Each open item: .q question, .a owner and what changes with each answer, .tag the ID. -->
+<section class="asks" id="asks" aria-labelledby="asks-title">
+<h2 id="asks-title">Decisions and open questions</h2>
+<div class="asks-grid">
+<div class="asks-col" id="decided">
+<div class="asks-head"><h3>Decided</h3></div>
+<ol>
+<li><span class="q">{{DECIDED_TOPIC}}</span><span class="a">{{DECIDED_ANSWER}}</span></li>
+</ol>
+</div>
+<div class="asks-col" id="open">
+<div class="asks-head"><h3>Still open</h3><button class="copy" type="button" data-target="open-list" data-label="Copy">Copy</button></div>
+<ol id="open-list">
+<li><span class="q">{{OPEN_QUESTION}}</span><span class="a">{{OPEN_OWNER_AND_EFFECT}}</span><span class="tag">{{OPEN_ID}}</span></li>
+</ol>
+</div>
+</div>
+</section>
+
+<footer class="pagefoot">
+<span>As of {{AS_OF}} · Revision {{REVISION}}</span>
+<span>{{FOOTER_NOTE}}</span>
+<a href="#top">Back to top</a>
+</footer>
+
+</main>
+</div>
+</div>
+
+<script>
+// reader.js
+// /reader.js
+</script>

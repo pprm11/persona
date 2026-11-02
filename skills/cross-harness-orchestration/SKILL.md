@@ -1,5 +1,4 @@
 ---
-level: persona
 name: cross-harness-orchestration
 description: "Coordinate parallel work or second opinions across Claude Code and Codex, with model selection, self-contained briefs, isolated writers and a budget ceiling. Use for portable or cross-harness orchestration."
 ---

@@ -1,11 +1,9 @@
 {
- "level": "persona",
- "name": "persona",
- "mode": "readonly",
- "globals": [
-  "practices.md"
- ],
- "rules": [],
- "dirs": [],
- "files": []
+  "level": "persona",
+  "name": "persona",
+  "mode": "readonly",
+  "globals": [],
+  "rules": [],
+  "dirs": [],
+  "files": []
 }

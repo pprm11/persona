@@ -1,0 +1,455 @@
+<!-- Fictional worked example; do not treat sample facts as real. -->
+<title>Driftwood Reference</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Tokens: light by default; dark follows the system unless the host forces a theme. Every color below comes from a token. */
+:root {
+  --bg: #f5f6f8; --surface: #ffffff; --fg: #1b2230; --muted: #5a6475; --line: #dde1e8;
+  --accent: #2c4f9e; --accent-soft: #e6ecf8; --on-accent: #ffffff;
+  --warn: #8a5a00; --warn-soft: #fbf1dc; --ok: #1f6b45; --ok-soft: #e1f2e8; --code-bg: #eef0f4;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #181d26; --fg: #e3e7ee; --muted: #9aa4b5; --line: #2a313d;
+  --accent: #8fb0f2; --accent-soft: #1f2a40; --on-accent: #12161d;
+  --warn: #e8b85a; --warn-soft: #2e2615; --ok: #6fcf9b; --ok-soft: #16301f; --code-bg: #1f2530; color-scheme: dark }
+/* Print always uses the light tokens (same specificity as the dark rules above, declared later). */
+@media print { :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+  --bg: #ffffff; --surface: #ffffff; --fg: #111111; --muted: #444444; --line: #bbbbbb;
+  --accent: #1d3f86; --accent-soft: #eef2fb; --on-accent: #ffffff;
+  --warn: #6b4500; --warn-soft: #fbf1dc; --ok: #14502f; --ok-soft: #e1f2e8; --code-bg: #f1f1f1; color-scheme: light } }
+
+/* Base */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--f-body); }
+main h1 { font: 600 clamp(27px, 5vw, 34px)/1.15 var(--f-display); margin: 0 0 10px; text-wrap: balance; }
+main h2 { font: 600 26px/1.2 var(--f-display); margin: 40px 0 12px; text-wrap: balance; }
+main h3 { font: 600 20px/1.3 var(--f-display); margin: 30px 0 8px; text-wrap: balance; }
+main h4 { font: 600 16px var(--f-display); margin: 22px 0 6px; }
+main p, main li, main dd { max-width: 78ch; overflow-wrap: anywhere; }
+main a { color: var(--accent); }
+code { font: 0.86em var(--f-mono); background: var(--code-bg); border-radius: 3px; padding: 1px 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 var(--f-mono); margin: 12px 0; }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
+blockquote { margin: 12px 0; padding: 4px 14px; border-left: 3px solid var(--line); color: var(--muted); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+.eyebrow { font: 500 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+.meta { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+
+/* Header and the In one minute slot */
+header.top { margin-bottom: 8px; }
+.oneminute { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 4px 18px 12px; margin: 16px 0 0; }
+.oneminute h2 { font-size: 18px; margin: 12px 0 6px; }
+
+/* Overview cards (optional) */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; margin: 24px 0 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; }
+main a.card { color: inherit; }
+.card:hover, .card:focus-visible { border-color: var(--accent); }
+.card .k { font: 500 12px var(--f-mono); color: var(--accent); letter-spacing: .04em; }
+.card .t { font: 600 16px/1.25 var(--f-display); }
+.card .d { font-size: 13px; color: var(--muted); flex: 1; }
+.card .f { font: 12px var(--f-mono); color: var(--muted); border-top: 1px solid var(--line); padding-top: 6px; }
+
+/* Callouts and chips: the label carries the meaning, color only reinforces it */
+.callout { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px 16px; margin: 14px 0; }
+.callout > :first-child { margin-top: 0; } .callout > :last-child { margin-bottom: 0; }
+.callout--warn { background: var(--warn-soft); border-left-color: var(--warn); }
+.callout--ok { background: var(--ok-soft); border-left-color: var(--ok); }
+.callout .label { font: 600 13px var(--f-display); letter-spacing: .03em; text-transform: uppercase; color: var(--accent); }
+.callout--warn .label { color: var(--warn); } .callout--ok .label { color: var(--ok); }
+.chip { display: inline-block; font: 600 12px var(--f-mono); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.chip--ok { background: var(--ok-soft); color: var(--ok); } .chip--warn { background: var(--warn-soft); color: var(--warn); }
+.chip--muted { background: var(--code-bg); color: var(--muted); }
+
+/* Numbered steps (tutorial and how-to) */
+ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 16px 0; display: grid; gap: 14px; }
+ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 4px 14px; max-width: none; }
+ol.steps > li::before { content: counter(step); grid-row: 1 / span 3; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+  font: 600 15px var(--f-display); color: var(--accent); background: var(--accent-soft); }
+ol.steps > li > * { grid-column: 2; min-width: 0; margin-top: 0; margin-bottom: 0; }
+
+/* Decisions and open questions (optional block) */
+.asks { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 20px 20px; margin: 32px 0; }
+.asks h2 { margin-top: 12px; }
+.asks-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; }
+.asks-col { min-width: 0; }
+.asks-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--accent); padding-bottom: 6px; margin-bottom: 10px; }
+.asks-head h3 { margin: 0; font-size: 18px; }
+.asks ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; }
+.asks .q { font-weight: 600; }
+.asks .a { display: block; color: var(--muted); font-size: 14px; }
+
+/* Glossary (feeds the term popovers) */
+dl.glossary { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); gap: 0 20px; margin: 12px 0; }
+dl.glossary dt { padding: 8px 0; border-top: 1px solid var(--line); }
+dl.glossary dd { margin: 0; padding: 8px 0; border-top: 1px solid var(--line); max-width: none; }
+
+/* Footer */
+footer.pagefoot { border-top: 1px solid var(--line); margin-top: 56px; padding-top: 16px; color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+
+@media (max-width: 960px) { .asks-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { dl.glossary { grid-template-columns: minmax(0, 1fr); } dl.glossary dt { padding-bottom: 0; } dl.glossary dd { border-top: 0; padding-top: 2px; } }
+@media print { .oneminute, .asks, .card { break-inside: avoid; } }
+
+/* reader.css */
+/* /reader.css */
+</style>
+
+<div class="reader-root" lang="en">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+
+<nav class="index" id="contents" aria-label="Contents">
+<button class="searchbtn" type="button" id="searchbtn">Search  ( / or Ctrl+K )</button>
+</nav>
+
+<main id="main" data-reader="all -copyopen" data-id-prefixes="CMD,OPT,CFG,ENV,FIL,EXIT,ERR">
+
+<header class="top" id="top">
+<p class="eyebrow">Sample content · Reference · Driftwood 2.4.0</p>
+<h1>Driftwood Reference</h1>
+<div class="callout callout--warn"><p><span class="label">Sample content.</span> Driftwood is a fictional product. Every name, value and source line on this page is invented to show the Reference layout.</p></div>
+<section class="oneminute" aria-labelledby="one-minute">
+<h2 id="one-minute" data-nomenu>In one minute</h2>
+<p>This page lists every command, option, configuration key, environment variable, file, exit code and error message of Driftwood 2.4.0, an open-source <abbr title="Command-line interface">CLI</abbr> that rotates and compresses log files. It describes facts and does not teach or explain; steps and reasons live in other documents.</p>
+<p>Look a name up in the contents, press <kbd>/</kbd> to search, or follow an ID such as CMD2. Each row has a permanent ID and a link you can copy. Values were read from the source at commit <code>9f3c2d1</code> and checked on 2026-11-01. One item is not verified; see Verification and gaps.</p>
+</section>
+<p class="meta">As of 2026-11-01 · Revision 3 · Describes Driftwood 2.4.0 · Owner: documentation maintainer</p>
+</header>
+
+<section id="what-changed">
+<h2>What changed in revision 3</h2>
+<ul>
+<li>Added ENV1, <code>DRIFTWOOD_CONFIG</code>, introduced in 2.3.</li>
+<li>CFG3 now lists <code>"zstd"</code>, which 2.2 added.</li>
+<li>Added ERR4 and EXIT4 for lock contention.</li>
+<li>Moved the Rotation procedure out of CMD2 and into a How-to.</li>
+</ul>
+</section>
+
+<section id="conventions">
+<h2>Conventions</h2>
+<p>Each kind of thing has one table shape, and every row has an ID in its first column. The ID is the row's permanent link and never changes.</p>
+
+<table>
+<thead><tr><th>Item</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>ID prefixes</td><td><code>CMD</code> command, <code>OPT</code> option, <code>CFG</code> config key, <code>ENV</code> environment variable, <code>FIL</code> file, <code>EXIT</code> exit code, <code>ERR</code> error message.</td></tr>
+<tr><td>Columns</td><td>Type is the value type. Default is the value used when the entry is absent. Allowed values are the full accepted set. Since is the first version that has the entry.</td></tr>
+<tr><td>Source</td><td><code>path:lines</code> in the Driftwood repository at commit <code>9f3c2d1</code>.</td></tr>
+<tr><td>Capitalized terms</td><td>A capitalized term such as Live log or Generation has its meaning from the Glossary.</td></tr>
+<tr><td>State words</td><td><code>[NOT VERIFIED: command]</code> marks a fact that was not checked; the command would check it. <code>[UNTESTED]</code> marks an example that was never run.</td></tr>
+<tr><td>Dates and versions</td><td>Dates are ISO 8601. Versions are Driftwood release numbers.</td></tr>
+</tbody></table>
+</section>
+
+<section id="map">
+<h2>Overview and map</h2>
+<p>Four commands share one config file and one state file. The table lists the commands; the figure shows which files each one touches.</p>
+
+<table>
+<thead><tr><th>ID</th><th>Command</th><th>Purpose</th><th>Synopsis</th><th>Exit codes</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-CMD1">CMD1</span></td><td><code>driftwood init</code></td><td>Create a starter config file.</td><td><code>driftwood init [--dir PATH] [--force]</code></td><td>0, 2, 3</td><td>1.0</td><td><code>cli/init.py:12-48</code></td></tr>
+<tr><td><span class="defid" id="def-CMD2">CMD2</span></td><td><code>driftwood run</code></td><td>Rotate and compress every Live log that is due.</td><td><code>driftwood run [--config PATH] [--dry-run] [--verbose]</code></td><td>0, 1, 2, 3, 4</td><td>1.0</td><td><code>cli/run.py:20-96</code></td></tr>
+<tr><td><span class="defid" id="def-CMD3">CMD3</span></td><td><code>driftwood check</code></td><td>Validate the config and list Live logs that are due.</td><td><code>driftwood check [--config PATH] [--strict]</code></td><td>0, 1, 2</td><td>1.0</td><td><code>cli/check.py:15-61</code></td></tr>
+<tr><td><span class="defid" id="def-CMD4">CMD4</span></td><td><code>driftwood restore</code></td><td>Copy one Generation of a Live log back.</td><td><code>driftwood restore FILE [--generation N] [--to PATH]</code></td><td>0, 3, 5</td><td>1.2</td><td><code>cli/restore.py:18-74</code></td></tr>
+</tbody></table>
+<p><strong>Figure: Files each command touches.</strong> Read left to right: a command reaches a file through the labeled edge. (Legend: rounded box is a command, cylinder is a config or state file, rectangle with a thick border is a log or an Archive file.)</p>
+<div class="diagram" id="figure-map"><pre class="mermaid">
+%%{init: {"flowchart": {"nodeSpacing": 22, "rankSpacing": 40, "padding": 6, "diagramPadding": 4}}}%%
+flowchart LR
+  accTitle: Files each Driftwood command touches
+  accDescr: init writes the config file. run reads the config file, rotates the Live log, writes the Archive and updates the State file. check reads the config file and the Live log. restore reads the Archive and the State file and writes a restored copy.
+  init(["CMD1 init"]):::cmd
+  run(["CMD2 run"]):::cmd
+  check(["CMD3 check"]):::cmd
+  restore(["CMD4 restore"]):::cmd
+  cfg[("FIL1 driftwood.toml")]:::cfgfile
+  state[("FIL2 state.json")]:::cfgfile
+  live["FIL3 Live log"]:::logfile
+  arch["FIL4 Archive"]:::logfile
+  copy["Restored copy"]:::logfile
+  init -- writes --> cfg
+  run -- reads --> cfg
+  run -- rotates --> live
+  run -- writes --> arch
+  run -- updates --> state
+  check -- reads --> cfg
+  check -- reads --> live
+  restore -- reads --> arch
+  restore -- reads --> state
+  restore -- writes --> copy
+  classDef cmd fill:#3b5fb0,stroke:#1d3f86,stroke-width:2px,color:#ffffff
+  classDef cfgfile fill:#d9e3f7,stroke:#1d3f86,stroke-width:2px,color:#111111
+  classDef logfile fill:#f3dfb0,stroke:#8a5a00,stroke-width:3px,color:#111111
+</pre>
+<details class="figtext"><summary>Text version</summary>
+<ul>
+<li>CMD1 writes FIL1.</li>
+<li>CMD2 reads FIL1, rotates FIL3, writes FIL4 and updates FIL2.</li>
+<li>CMD3 reads FIL1 and FIL3.</li>
+<li>CMD4 reads FIL4 and FIL2 and writes a restored copy.</li>
+</ul>
+</details>
+</div>
+<p>Source of the figure: the Files table below, columns Created by and Read by, as of 2026-11-01.</p>
+</section>
+
+
+<section id="commands">
+<h2>Commands</h2>
+<p>All commands accept the global options. Exit codes are in the Exit codes table.</p>
+<h3 id="global-options">Global options</h3>
+
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Meaning</th><th>Type</th><th>Default</th><th>Allowed values</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-OPT1">OPT1</span></td><td><code>--config PATH</code></td><td>Path of the config file.</td><td>path</td><td><code>./driftwood.toml</code> or ENV1</td><td>Any readable file</td><td>1.0</td><td><code>cli/main.py:30-34</code></td></tr>
+<tr><td><span class="defid" id="def-OPT2">OPT2</span></td><td><code>--quiet</code></td><td>Print errors only.</td><td>flag</td><td>off</td><td>none</td><td>1.1</td><td><code>cli/main.py:36-38</code></td></tr>
+<tr><td><span class="defid" id="def-OPT3">OPT3</span></td><td><code>--help</code></td><td>Print usage and exit 0.</td><td>flag</td><td>off</td><td>none</td><td>1.0</td><td><code>cli/main.py:40</code></td></tr>
+<tr><td><span class="defid" id="def-OPT4">OPT4</span></td><td><code>--version</code></td><td>Print the version and exit 0.</td><td>flag</td><td>off</td><td>none</td><td>1.0</td><td><code>cli/main.py:41</code></td></tr>
+</tbody></table>
+<h3 id="cmd-init">driftwood init</h3>
+<pre><code>driftwood init [--dir PATH] [--force]</code></pre>
+<p>Writes a starter FIL1 into PATH. Without OPT6 it exits 2 when the file exists. PATH is a folder.</p>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Meaning</th><th>Type</th><th>Default</th><th>Allowed values</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-OPT5">OPT5</span></td><td><code>--dir PATH</code></td><td>Folder that receives the new file.</td><td>path</td><td><code>.</code></td><td>Existing writable folder</td><td>1.0</td><td><code>cli/init.py:14-19</code></td></tr>
+<tr><td><span class="defid" id="def-OPT6">OPT6</span></td><td><code>--force</code></td><td>Overwrite an existing file.</td><td>flag</td><td>off</td><td>none</td><td>1.0</td><td><code>cli/init.py:21-24</code></td></tr>
+</tbody></table>
+<p>Example, in an empty folder:</p>
+<pre><code>$ driftwood init --dir ./logs
+wrote ./logs/driftwood.toml
+$ echo $?
+0</code></pre>
+<h3 id="cmd-run">driftwood run</h3>
+<pre><code>driftwood run [--config PATH] [--dry-run] [--verbose]</code></pre>
+<p>Rotates and compresses every Live log whose Trigger fired. A Live log is due when its size is above CFG4 or when the CFG5 time has been reached, whichever comes first. After a Rotation, Generations above CFG2 are deleted.</p>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Meaning</th><th>Type</th><th>Default</th><th>Allowed values</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-OPT7">OPT7</span></td><td><code>--dry-run</code></td><td>Report the actions and change nothing.</td><td>flag</td><td>off</td><td>none</td><td>1.3</td><td><code>cli/run.py:22-27</code></td></tr>
+<tr><td><span class="defid" id="def-OPT8">OPT8</span></td><td><code>--verbose</code></td><td>Print one line per file.</td><td>flag</td><td>off</td><td>none</td><td>1.0</td><td><code>cli/run.py:29-31</code></td></tr>
+</tbody></table>
+<p>Example of a Dry run with the output it prints:</p>
+<pre><code>$ driftwood run --dry-run
+warning: dry run, no files changed
+would rotate /var/log/app/app.log -&gt; app.log.1.gz (compress gzip)
+would delete app.log.7.gz (would become generation 8, keep is 7)
+$ echo $?
+0</code></pre>
+<p>Example of a real run with <code>--verbose</code>, which prints one line per file before the summary. Without <code>--verbose</code> only the summary line is printed, and it reads <code>0 files rotated, 0 skipped</code> when nothing is due.</p>
+<pre><code>$ driftwood run --verbose
+rotated ./app.log -&gt; app.log.1.gz
+1 file rotated, 0 skipped
+$ echo $?
+0</code></pre>
+<h3 id="cmd-check">driftwood check</h3>
+<pre><code>driftwood check [--config PATH] [--strict]</code></pre>
+<p>Validates FIL1 and lists every Live log that is due. It changes no file.</p>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Meaning</th><th>Type</th><th>Default</th><th>Allowed values</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-OPT9">OPT9</span></td><td><code>--strict</code></td><td>Exit 1 on warnings as well as on due files.</td><td>flag</td><td>off</td><td>none</td><td>2.0</td><td><code>cli/check.py:17-22</code></td></tr>
+</tbody></table>
+<p>Example where one Live log is due:</p>
+<pre><code>$ driftwood check
+config: ./driftwood.toml ok
+due  /var/log/app/app.log     62MB &gt; max_size 50MB
+ok   /var/log/app/worker.log   4MB
+1 file due
+$ echo $?
+1</code></pre>
+<p>Example where nothing is due:</p>
+<pre><code>$ driftwood check
+config: ./driftwood.toml ok
+ok   ./app.log   0KB
+0 files due
+$ echo $?
+0</code></pre>
+<h3 id="cmd-restore">driftwood restore</h3>
+<pre><code>driftwood restore FILE [--generation N] [--to PATH]</code></pre>
+<p>Copies Generation N of FILE out of the Archive. FILE is the Live log name, for example <code>app.log</code>. It never overwrites a Live log. Introduced in 1.2.</p>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Meaning</th><th>Type</th><th>Default</th><th>Allowed values</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-OPT10">OPT10</span></td><td><code>--generation N</code></td><td>Generation to copy back.</td><td>integer</td><td><code>1</code></td><td>1 to the value of CFG2</td><td>1.2</td><td><code>cli/restore.py:20-26</code></td></tr>
+<tr><td><span class="defid" id="def-OPT11">OPT11</span></td><td><code>--to PATH</code></td><td>Destination of the copy.</td><td>path</td><td><code>FILE.restored</code></td><td>Any writable path that does not exist</td><td>1.2</td><td><code>cli/restore.py:28-35</code></td></tr>
+</tbody></table>
+<p>Example, restoring Generation 2:</p>
+<pre><code>$ driftwood restore app.log --generation 2
+restored app.log.2.gz -&gt; app.log.restored
+$ echo $?
+0</code></pre>
+</section>
+
+<section id="configuration">
+<h2>Configuration file</h2>
+<p>Driftwood reads FIL1 in <abbr title="Tom&#x27;s Obvious Minimal Language">TOML</abbr>. It looks for the file at OPT1, then at ENV1, then in the current folder. All keys live in the <code>[rotate]</code> table.</p>
+
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Meaning</th><th>Type</th><th>Default</th><th>Allowed values</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-CFG1">CFG1</span></td><td><code>path</code></td><td>Folder that holds the Live logs.</td><td>string</td><td>none, required</td><td>Existing folder</td><td>1.0</td><td><code>config/schema.py:10-18</code></td></tr>
+<tr><td><span class="defid" id="def-CFG2">CFG2</span></td><td><code>keep</code></td><td>Number of Generations kept per Live log.</td><td>integer</td><td><code>7</code></td><td>1 to 365</td><td>1.0</td><td><code>config/schema.py:21-28</code></td></tr>
+<tr><td><span class="defid" id="def-CFG3">CFG3</span></td><td><code>compress</code></td><td>Compression applied to each Generation.</td><td>string</td><td><code>&quot;gzip&quot;</code></td><td><code>&quot;none&quot;</code>, <code>&quot;gzip&quot;</code>, <code>&quot;zstd&quot;</code> (zstd since 2.2)</td><td>1.0</td><td><code>config/schema.py:30-39</code></td></tr>
+<tr><td><span class="defid" id="def-CFG4">CFG4</span></td><td><code>max_size</code></td><td>Size above which a Live log is due.</td><td>string</td><td><code>&quot;50MB&quot;</code></td><td>Integer plus KB, MB or GB, from 1KB to 10GB</td><td>1.0</td><td><code>config/schema.py:41-52</code></td></tr>
+<tr><td><span class="defid" id="def-CFG5">CFG5</span></td><td><code>schedule</code></td><td>Time Trigger for a Live log.</td><td>string</td><td><code>&quot;daily&quot;</code></td><td><code>&quot;hourly&quot;</code>, <code>&quot;daily&quot;</code>, <code>&quot;weekly&quot;</code>, or a 5-field cron expression (cron since 2.1)</td><td>1.0</td><td><code>config/schema.py:54-70</code></td></tr>
+</tbody></table>
+<h3 id="cfg-rules">Rules across keys</h3>
+<ul>
+<li>A Live log is due when CFG4 is exceeded or the CFG5 time is reached, whichever comes first.</li>
+<li>CFG3 set to <code>"none"</code> keeps Generations uncompressed, with no suffix on FIL4.</li>
+<li>CFG1 is the only required key.</li>
+</ul>
+<p>A complete valid file:</p>
+<pre><code>[rotate]
+path = "/var/log/app"
+keep = 7
+compress = "gzip"
+max_size = "50MB"
+schedule = "daily"</code></pre>
+</section>
+
+
+<section id="environment">
+<h2>Environment variables</h2>
+<p>An environment variable never overrides an explicit option.</p>
+
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Meaning</th><th>Type</th><th>Default</th><th>Allowed values</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-ENV1">ENV1</span></td><td><code>DRIFTWOOD_CONFIG</code></td><td>Config path used when OPT1 is absent.</td><td>path</td><td>unset</td><td>Any readable file</td><td>2.3</td><td><code>cli/main.py:12-18</code></td></tr>
+<tr><td><span class="defid" id="def-ENV2">ENV2</span></td><td><code>NO_COLOR</code></td><td>Turn off colored output.</td><td>string</td><td>unset</td><td>Any non-empty value</td><td>1.1</td><td><code>cli/output.py:9-14</code></td></tr>
+</tbody></table>
+</section>
+
+<section id="files">
+<h2>Files</h2>
+<p>Paths are relative to the log folder named in CFG1 unless stated.</p>
+
+<table>
+<thead><tr><th>ID</th><th>Path</th><th>Role</th><th>Created by</th><th>Read by</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-FIL1">FIL1</span></td><td><code>driftwood.toml</code></td><td>Config file.</td><td>CMD1</td><td>CMD2, CMD3</td><td>1.0</td><td><code>config/load.py:11-40</code></td></tr>
+<tr><td><span class="defid" id="def-FIL2">FIL2</span></td><td><code>.driftwood/state.json</code></td><td>State file with the last Rotation time of each Live log.</td><td>CMD2</td><td>CMD2, CMD3, CMD4</td><td>1.0</td><td><code>state/store.py:8-52</code></td></tr>
+<tr><td><span class="defid" id="def-FIL3">FIL3</span></td><td><code>NAME.log</code></td><td>Live log, written by the application.</td><td>the application</td><td>CMD2, CMD3</td><td>1.0</td><td><code>run/rotate.py:30-44</code></td></tr>
+<tr><td><span class="defid" id="def-FIL4">FIL4</span></td><td><code>NAME.log.N.gz</code></td><td>Archive Generation N. N=1 is the newest. The suffix is <code>.zst</code> for zstd and absent for <code>&quot;none&quot;</code>.</td><td>CMD2</td><td>CMD4</td><td>1.0</td><td><code>run/rotate.py:46-88</code></td></tr>
+<tr><td><span class="defid" id="def-FIL5">FIL5</span></td><td><code>.driftwood/lock</code></td><td>Lock file held while CMD2 runs.</td><td>CMD2</td><td>CMD2</td><td>2.0</td><td><code>state/lock.py:5-31</code></td></tr>
+</tbody></table>
+</section>
+
+<section id="exit-codes">
+<h2>Exit codes</h2>
+
+<table>
+<thead><tr><th>ID</th><th>Code and name</th><th>Raised when</th><th>Commands</th><th>Since</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-EXIT0">EXIT0</span></td><td><code>0</code> success</td><td>The command finished and found nothing to report.</td><td>all</td><td>1.0</td></tr>
+<tr><td><span class="defid" id="def-EXIT1">EXIT1</span></td><td><code>1</code> findings</td><td>CMD3 found a due Live log, or a warning with OPT9. CMD2 skipped at least one file.</td><td>CMD2, CMD3</td><td>1.0</td></tr>
+<tr><td><span class="defid" id="def-EXIT2">EXIT2</span></td><td><code>2</code> config error</td><td>FIL1 is missing, unreadable or holds an invalid value.</td><td>CMD1, CMD2, CMD3</td><td>1.0</td></tr>
+<tr><td><span class="defid" id="def-EXIT3">EXIT3</span></td><td><code>3</code> permission denied</td><td>A path cannot be read or written by the current user.</td><td>CMD1, CMD2, CMD4</td><td>1.0</td></tr>
+<tr><td><span class="defid" id="def-EXIT4">EXIT4</span></td><td><code>4</code> lock held</td><td>Another CMD2 holds FIL5.</td><td>CMD2</td><td>2.0</td></tr>
+<tr><td><span class="defid" id="def-EXIT5">EXIT5</span></td><td><code>5</code> restore failed</td><td>The requested Generation or the destination is not usable.</td><td>CMD4</td><td>1.2</td></tr>
+</tbody></table>
+</section>
+
+<section id="errors">
+<h2>Errors and messages</h2>
+<p>Rows are keyed by the exact message. Variable parts, such as a path or a number, show a real example and are named in the Raised when cell.</p>
+
+<table>
+<thead><tr><th>ID</th><th>Exact message</th><th>Exit code</th><th>Raised when</th><th>Command</th><th>Since</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><span class="defid" id="def-ERR1">ERR1</span></td><td><code>error: config not found</code></td><td>2</td><td>No FIL1 in the current folder, at OPT1, or at ENV1.</td><td>CMD2, CMD3</td><td>1.0</td><td><code>config/load.py:12-19</code></td></tr>
+<tr><td><span class="defid" id="def-ERR2">ERR2</span></td><td><code>error: permission denied on /var/log/app</code></td><td>3</td><td>The user cannot write the folder named in CFG1. The path in the message is the failing path.</td><td>CMD1, CMD2, CMD4</td><td>1.0</td><td><code>run/rotate.py:22-28</code></td></tr>
+<tr><td><span class="defid" id="def-ERR3">ERR3</span></td><td><code>error: invalid value for keep: 400 (allowed 1 to 365)</code></td><td>2</td><td>A key holds a value outside its allowed range. The key name, value and range vary.</td><td>CMD2, CMD3</td><td>1.0</td><td><code>config/schema.py:90-104</code></td></tr>
+<tr><td><span class="defid" id="def-ERR4">ERR4</span></td><td><code>error: another run holds the lock</code></td><td>4</td><td>FIL5 exists and its process is alive.</td><td>CMD2</td><td>2.0</td><td><code>state/lock.py:12-24</code></td></tr>
+<tr><td><span class="defid" id="def-ERR5">ERR5</span></td><td><code>error: generation 9 not found for app.log</code></td><td>5</td><td>The Archive holds no Generation N for the Live log. N and the file name vary.</td><td>CMD4</td><td>1.2</td><td><code>cli/restore.py:44-52</code></td></tr>
+<tr><td><span class="defid" id="def-ERR6">ERR6</span></td><td><code>error: unknown compress value &quot;lz4&quot;</code></td><td>2</td><td>CFG3 holds a value outside its allowed list.</td><td>CMD2, CMD3</td><td>1.0</td><td><code>config/schema.py:106-112</code></td></tr>
+<tr><td><span class="defid" id="def-ERR7">ERR7</span></td><td><code>error: driftwood.toml already exists</code></td><td>2</td><td>CMD1 would overwrite FIL1 and OPT6 is absent.</td><td>CMD1</td><td>1.0</td><td><code>cli/init.py:30-36</code></td></tr>
+</tbody></table>
+</section>
+
+<section id="versions">
+<h2>Changes by version</h2>
+
+<table>
+<thead><tr><th>Entry</th><th>Change</th><th>Version</th></tr></thead>
+<tbody>
+<tr><td><code>schedule</code></td><td>CFG5 accepts a 5-field cron expression.</td><td>2.1</td></tr>
+<tr><td><code>compress</code></td><td>CFG3 accepts <code>&quot;zstd&quot;</code>.</td><td>2.2</td></tr>
+<tr><td><code>DRIFTWOOD_CONFIG</code></td><td>ENV1 introduced.</td><td>2.3</td></tr>
+<tr><td><code>--dry-run</code></td><td>OPT7 introduced.</td><td>1.3</td></tr>
+</tbody></table>
+</section>
+
+<section id="glossary">
+<h2>Glossary</h2>
+<p>One definition per term, each a genus plus a difference. Version 1.0, 2026-11-01.</p>
+
+<dl class="glossary">
+<dt class="defterm">Archive</dt><dd>The set of compressed Generations kept for one Live log. Related: FIL4, CFG3.</dd>
+<dt class="defterm">Dry run</dt><dd>A run that reports what it would do and changes no file. Related: OPT7.</dd>
+<dt class="defterm">Generation</dt><dd>A numbered Archive copy of a Live log. Generation 1 is the newest. Related: FIL4, CFG2.</dd>
+<dt class="defterm" data-aliases="live logs">Live log</dt><dd>A log file that an application still writes to. Related: FIL3.</dd>
+<dt class="defterm">Lock file</dt><dd>The file <code>.driftwood/lock</code>, which stops two runs from rotating at once. Related: FIL5, ERR4.</dd>
+<dt class="defterm">Retention</dt><dd>The number of Generations kept per Live log, set by CFG2. Related: CFG2.</dd>
+<dt class="defterm" data-aliases="rotate, rotated">Rotation</dt><dd>The act of renaming a Live log to Generation 1 and starting an empty Live log. Related: CMD2.</dd>
+<dt class="defterm">State file</dt><dd>The JSON file that records the last Rotation time of each Live log. Related: FIL2.</dd>
+<dt class="defterm">Trigger</dt><dd>A condition that makes a Live log due: size above CFG4, or the CFG5 time reached. Related: CFG4, CFG5.</dd>
+</dl>
+<h3 id="abbreviations">Abbreviations</h3>
+<table data-abbr>
+<thead><tr><th>Abbreviation</th><th>Expansion</th></tr></thead>
+<tbody>
+<tr><td>CLI</td><td>Command-line interface</td></tr>
+<tr><td>TOML</td><td>Tom's Obvious Minimal Language</td></tr>
+<tr><td>UTC</td><td>Coordinated Universal Time</td></tr>
+<tr><td>SHA</td><td>Secure Hash Algorithm; here, the id of a commit</td></tr>
+</tbody></table>
+</section>
+
+<section id="verification">
+<h2>Verification and gaps</h2>
+<p>Entry counts: 4 commands, 11 options, 5 config keys, 2 environment variables, 5 files, 6 exit codes, 7 error messages. The counts match the source at commit <code>9f3c2d1</code>.</p>
+
+<table>
+<thead><tr><th>Check</th><th>Command</th><th>Result</th><th>Date</th></tr></thead>
+<tbody>
+<tr><td>Options and keys against usage text</td><td><code>driftwood run --help</code> and the other commands</td><td>Match</td><td>2026-11-01</td></tr>
+<tr><td>Defaults and ranges against the schema</td><td><code>python -m driftwood.schema --dump</code></td><td>Match</td><td>2026-11-01</td></tr>
+<tr><td>Messages against the source</td><td><code>grep -rn &#x27;error:&#x27; src/driftwood</code></td><td>7 of 7 match</td><td>2026-11-01</td></tr>
+<tr><td>Examples</td><td>Ran each example in an empty folder on Linux</td><td>Output matches</td><td>2026-11-01</td></tr>
+</tbody></table>
+<p>Pending: exit code of CMD4 on a read-only filesystem. Owner: release maintainer. Needed for: the ERR2 row.</p>
+<p><code>[NOT VERIFIED: run driftwood restore app.log --to /mnt/readonly/out and record the exit code]</code></p>
+</section>
+
+<footer class="pagefoot">
+<span>As of 2026-11-01 · Revision 3 · Driftwood 2.4.0</span>
+<span>Sample content. Report an error to the documentation maintainer.</span>
+<a href="#top">Back to top</a>
+</footer>
+
+
+</main>
+</div>
+</div>
+
+<script>
+// reader.js
+// /reader.js
+</script>

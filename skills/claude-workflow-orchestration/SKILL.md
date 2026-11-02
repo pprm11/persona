@@ -1,5 +1,4 @@
 ---
-level: persona
 name: claude-workflow-orchestration
 description: "Prepare Claude Sonnet and Haiku briefs and Workflows, including long handoffs and failure recovery. Use when delegating to cheaper Claude models or authoring a Workflow script. Cross-harness coordination lives in cross-harness-orchestration."
 ---
@@ -133,3 +132,5 @@ almost every time); asking "do not cheat" barely changes it, while giving an esc
 ## Related
 
 - `cross-harness-orchestration`: the same pattern with children from another harness
+
+When `cross-harness-orchestration` is unavailable, choose an available model, write a self-contained brief, isolate writers, and enforce the agreed budget directly.

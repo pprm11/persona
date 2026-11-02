@@ -1,5 +1,4 @@
 ---
-level: persona
 name: root-cause
 description: "Diagnose an error, bug, CI failure or recurring rework: reproduce it, use an Ishikawa diagram and causal questions, prove the root cause, and separate correction, containment and prevention. Use for root cause analysis, Ishikawa or 5 whys."
 ---

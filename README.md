@@ -1,125 +1,60 @@
 # persona
 
-**Nine skills that make a coding agent work like a careful senior engineer.** Root cause before the fix, review
-before the push, text that reads like a person wrote it, and a design series you can trace from problem to
-detailed design.
-
-[![skills.sh](https://img.shields.io/badge/skills.sh-pprm11%2Fpersona-000000)](https://www.skills.sh/pprm11/persona)
-![skills](https://img.shields.io/badge/skills-9-blue)
-![agents](https://img.shields.io/badge/works%20with-Claude%20Code%20%7C%20Codex%20%7C%20Cursor-555555)
-[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-
-```bash
-npx skills add pprm11/persona
-```
-
-One command installs every skill into your agent through the [skills.sh](https://www.skills.sh/) CLI. Each skill
-is a plain `skills/<name>/SKILL.md`, so you can read exactly what your agent will do before you install it.
-
-## Skills
-
-### Code
-
-| Skill | What your agent does with it |
-|---|---|
-| [`root-cause`](skills/root-cause/SKILL.md) | Reproduces a bug or CI failure, draws an Ishikawa, asks why until the root is proven, then separates correction, containment and prevention |
-| [`critical-code-review`](skills/critical-code-review/SKILL.md) | Reviews a branch before push through four lenses plus a scope audit, and fixes what it finds. Pairs with Uncle Bob's `ub-mode` (see [Credits](#credits)) |
-
-### Design
-
-| Skill | What your agent does with it |
-|---|---|
-| [`staged-engineering`](skills/staged-engineering/SKILL.md) | Drives a six-stage design series (problem, as-is, market study, solution domain, HLA with ADRs, HLD) and cascades a change in an early stage to the later ones. The page build and check scripts come from a separate `artifact-routing` skill, not bundled |
-| [`brief`](skills/brief/SKILL.md) | Turns a loose request into a brief with goal, done-when, mode and scope, filling missing lines with stated defaults |
-
-### Writing
-
-| Skill | What your agent does with it |
-|---|---|
-| [`humanize`](skills/humanize/SKILL.md) | Rewrites a text in one pass so it reads well for a human, keeping the author's voice and meaning |
-| [`humanize-heavy`](skills/humanize-heavy/SKILL.md) | Rewrites until the text passes a deterministic AI-tell scorer and three blind detection agents |
-
-### Orchestration
-
-| Skill | What your agent does with it |
-|---|---|
-| [`cross-harness-orchestration`](skills/cross-harness-orchestration/SKILL.md) | Splits work across Claude Code and Codex, with a model per task, self-contained briefs, one writer per file and a budget ceiling |
-| [`claude-workflow-orchestration`](skills/claude-workflow-orchestration/SKILL.md) | Writes briefs and Workflow scripts for Sonnet and Haiku, long handoffs and recovery after a failed run. Claude Code only |
-| [`inline-widgets`](skills/inline-widgets/SKILL.md) | Answers status, plans and comparisons with inline visual widgets. Needs the Claude app's visualize tool |
-
-## Install
-
-Everything:
-
-```bash
-npx skills add pprm11/persona
-```
-
-One skill:
-
-```bash
-npx skills add pprm11/persona --skill root-cause
-```
-
-Several skills, globally, for Claude Code:
-
-```bash
-npx skills add pprm11/persona --skill root-cause --skill critical-code-review -g -a claude-code
-```
-
-See the list before installing:
+Reusable, independent skills for engineering, research, writing and collaboration. Each skill has a `SKILL.md` entrypoint and can be installed individually.
 
 ```bash
 npx skills add pprm11/persona --list
+npx skills add pprm11/persona --skill root-cause
 ```
 
-Update later with `npx skills update`.
+To install every skill, run `npx skills add pprm11/persona`. For several named skills, repeat `--skill`; the CLI also supports global and agent selection flags. Review the CLI's current help before using those options. Update installed skills with `npx skills update`.
 
-## Try it
+The CLI reads the published repository. A successful install and appearance in the skills.sh directory are separate observations. See [contribution and release](CONTRIBUTING.md).
 
-After installing, ask your agent things like:
+## Catalog
 
-- "The login test fails only in CI. Find the root cause."
-- "Review this branch before I push."
-- "Humanize this README."
-- "Start a design series for moving billing to events."
+| Skill | Owns |
+|---|---|
+| [artifact-routing](skills/artifact-routing/SKILL.md) | Route a document, HTML page or diagram to its Diataxis type (tutorial, how-to, reference, explanation), one type per tab when they share a page, then write, build and check it. Other media use the same routing plus a medium skill. Use when drafting or revising an artifact. |
+| [brief](skills/brief/SKILL.md) | Request format (brief): required lines, defaults for each missing line, and how the agent applies them. Use when a new request arrives outside the format, when Goal, Done when or Mode is missing, or when the user asks for the brief, the request format or the template. |
+| [claude-workflow-orchestration](skills/claude-workflow-orchestration/SKILL.md) | Prepare Claude Sonnet and Haiku briefs and Workflows, including long handoffs and failure recovery. Use when delegating to cheaper Claude models or authoring a Workflow script. Cross-harness coordination lives in cross-harness-orchestration. |
+| [clean-architecture](skills/clean-architecture/SKILL.md) | Write or review domain boundaries, ports and adapters, dependency direction and typed domain models. |
+| [context-ingest](skills/context-ingest/SKILL.md) | Save an explicitly authorized durable fact to the active memory system with deduplication and provenance. |
+| [context-recall](skills/context-recall/SKILL.md) | Find and verify existing project memory, decisions, rules or skills before answering or acting. |
+| [critical-code-review](skills/critical-code-review/SKILL.md) | Review a branch before push through four lenses, with scope audit and corrections. Use for a very critical code review or a review before pushing; reviewing an existing PR's comments is a separate skill. |
+| [cross-harness-orchestration](skills/cross-harness-orchestration/SKILL.md) | Coordinate parallel work or second opinions across Claude Code and Codex, with model selection, self-contained briefs, isolated writers and a budget ceiling. Use for portable or cross-harness orchestration. |
+| [decision-rfc](skills/decision-rfc/SKILL.md) | Write a decision RFC describing a sourced problem, options, tradeoffs and open questions. |
+| [humanize](skills/humanize/SKILL.md) | Rewrite a text so it reads well for a human, in the author's voice, with the meaning intact. One pass, no scorer, no agents. Use on /humanize, "humanize this", "make this read better", or before delivering any written piece. When the user asks for the heavy, full or scored version ("with the scorer", "does this sound AI-written?"), use `humanize-heavy` instead. |
+| [humanize-heavy](skills/humanize-heavy/SKILL.md) | Heavy mode of humanize. Iteratively rewrite a text until it passes a deterministic AI-tell scorer plus three context-free AI-detection agents; output stays in the input language. Use only when the user asks for the heavy, full or scored version ("heavy humanize", "with the scorer", "does this sound AI-written?") or a calling skill requires the scored pipeline. The default, unscored pass is the `humanize` skill. |
+| [inline-widgets](skills/inline-widgets/SKILL.md) | Answers the user with inline visual widgets (show_widget) for status, plans, task queues, comparisons, results and numbers. Use whenever the reply has progress, a task or wave list, an option comparison, metrics or a plan. Skip for one-line answers. |
+| [measured-correction](skills/measured-correction/SKILL.md) | Run a measured correction cycle for evaluation failures, including options and before/after comparison. |
+| [publish-pull-request](skills/publish-pull-request/SKILL.md) | Publish an explicitly authorized author-side pull request or update and follow its checks. |
+| [pull-request-description](skills/pull-request-description/SKILL.md) | Write or revise a pull request description that explains behavior, evidence and risk to reviewers. |
+| [pull-request-review](skills/pull-request-review/SKILL.md) | Review an existing pull request as a reviewer and prepare actionable, evidence-backed findings. |
+| [outcome-driven-development](skills/outcome-driven-development/SKILL.md) | Connects software outcomes, source authority, evidence and adoption. |
+| [python-idioms](skills/python-idioms/SKILL.md) | Write or review idiomatic Python: types, errors, async, configuration, tests and I/O. |
+| [root-cause](skills/root-cause/SKILL.md) | Diagnose an error, bug, CI failure or recurring rework: reproduce it, use an Ishikawa diagram and causal questions, prove the root cause, and separate correction, containment and prevention. Use for root cause analysis, Ishikawa or 5 whys. |
+| [secret-backup](skills/secret-backup/SKILL.md) | Back up or restore secret files with an existing encrypted provider and locally configured manifest. |
+| [session-closeout](skills/session-closeout/SKILL.md) | Close or archive a session when explicitly requested, preserving deliverables and unresolved work. |
+| [staged-engineering](skills/staged-engineering/SKILL.md) | Drive a traceable six-stage engineering design series: problem domain and as-is, market study, solution domain, HLA with ADRs, then HLD. Use for RFC to HLA to HLD work, a design series with traceability, or cascading revisions when an earlier stage changes. |
+| [task-cards](skills/task-cards/SKILL.md) | Turn a plan into actionable task cards with observable acceptance criteria and dependencies. |
+| [tree-search](skills/tree-search/SKILL.md) | Research an internet topic in rounds, expanding from evidence, gaps and contradictions. |
 
-The agent picks the skill from its description; you do not have to name it.
+## Workflow boundaries
 
-## The practices file
+- `root-cause` proves causes; `measured-correction` owns decisions and before/after evaluation.
+- `critical-code-review` reviews the author’s local change; `pull-request-review` reviews an existing PR; `pull-request-description` writes its body; `publish-pull-request` handles authorized author publication.
+- `outcome-driven-development` owns outcome, scope, evidence and adoption; `staged-engineering` owns an explicitly requested design series.
+- `decision-rfc` handles one decision; `staged-engineering` handles a traceable design series; `artifact-routing` shapes artifacts and does not invoke the genre workflow back.
+- `context-recall` reads memory; `context-ingest` writes authorized facts; `session-closeout` handles an explicitly requested closeout.
+- `cross-harness-orchestration` owns cross-harness coordination; `claude-workflow-orchestration` supplies Claude-specific mechanics.
 
-[`global/practices.md`](global/practices.md) holds the rules these skills assume: status in three or four
-bullets, decisions as a lettered menu, root cause before a fix, review before push, stop a review loop that does
-not converge. The CLI installs skills only, so copy the lines you agree with into your `CLAUDE.md` or `AGENTS.md`.
-
-## Use it as a layer
-
-The repo is also the `persona` level of a layered agent context (named after Jung's persona, the public face a
-person shows). It loads after `superego` and before `collective`, so a team, a company or the person can override
-it. Precedence, strongest first: `id`, `ego`, `collective`, `persona`, `superego`. Nothing private lives here;
-private history and settings belong to the `id` layer.
-
-Add it to your `self` manifest between `superego` and `collective`:
-
-```json
-{"level": "persona", "name": "persona", "path": "persona", "repo": "https://github.com/pprm11/persona", "active": true, "mode": "readonly"}
-```
+Optional sibling skills are referenced by name; when installed alone, use the fallback in the entrypoint. `ub-mode` and vendor tooling are external and retain their own terms.
 
 ## Credits
 
-- **`ub-mode`** is Robert C. Martin's skill, and these skills assume it for every code change (make it work, make
-  it right, follow practice, with CRAP, duplication and mutation checks). It is not bundled here. Install it from
-  his repo:
-
-  ```bash
-  npx skills add unclebob/ub-mode
-  ```
-
-- **`humanize`** and **`humanize-heavy`** take part of their list of AI tells (words like "delve", "tapestry",
-  "pivotal", stacked transitions and hedges) from Wikipedia's
-  [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing), kept by WikiProject AI
-  Cleanup. The rewrite procedure and the scorer are written here.
+The `humanize` and `humanize-heavy` AI-tell lists draw in part on [Wikipedia's Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing); their rewrite procedure and scorer are maintained here. `ub-mode` is external work by Robert C. Martin and is not bundled; consult its own license before use. The artifact routing approach draws on [Diataxis](https://diataxis.fr/).
 
 ## License
 
-[MIT](LICENSE). The credited third-party work keeps its own terms.
+[MIT](LICENSE). The existing `humanize` scorer credits the external source in its skill.
