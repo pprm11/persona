@@ -38,6 +38,10 @@ class CatalogTests(unittest.TestCase):
             valid='---\nname: sample\ndescription: Example\n---\n\n# Sample\n'
             path.write_text(valid, encoding='utf-8'); self.assertEqual([], audit_file(path))
             path.write_text(valid+'[missing](no-file.md)', encoding='utf-8'); self.assertTrue(any('broken link' in x for x in audit_file(path)))
+            path.write_text(valid+'[placeholder](...)', encoding='utf-8'); self.assertIn('broken link: ...', audit_file(path))
+            path.write_text(valid+'[trailing](SKILL.md.)', encoding='utf-8'); self.assertIn('broken link: SKILL.md.', audit_file(path))
+            path.write_text(valid+'```\n[example](...)\n```\n~~~\n[example](missing.md)\n~~~\n', encoding='utf-8'); self.assertEqual([], audit_file(path))
+            path.write_text(valid+'```\n[example](...)\n```\n[after](missing.md)\n', encoding='utf-8'); self.assertIn('broken link: missing.md', audit_file(path))
             path.write_text(valid+'\n'+'sk-'+'abcdefghijklmnopqrstuv', encoding='utf-8'); self.assertIn('secret token', audit_file(path))
             path.write_text(valid+'\n'+'C:' + '\\' + 'Users' + '\\' + 'fixture', encoding='utf-8'); self.assertIn('user path', audit_file(path))
             path.write_text(valid+'\n'+'PRIVATE_FIXTURE', encoding='utf-8'); self.assertIn('private marker', audit_file(path, ['PRIVATE_FIXTURE']))

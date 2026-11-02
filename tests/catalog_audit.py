@@ -15,6 +15,14 @@ GENERIC = {
 }
 
 LINK = re.compile(r'(?<!!)\[[^\]]+\]\(([^)]+)\)')
+# Links inside a fenced block are examples, such as template placeholders, and are not checked.
+FENCE = re.compile(r'(?ms)^[ \t]*(`{3,}|~{3,}).*?^[ \t]*\1[ \t]*$')
+
+def link_exists(folder, target):
+    # Windows drops trailing dots and spaces from a path segment, so '...' would resolve to the folder itself.
+    if any(part not in ('.', '..') and part != part.rstrip('. ') for part in re.split(r'[\\/]', target)):
+        return False
+    return (folder / target).exists()
 
 def audit_file(path, private_terms=()):
     text = path.read_text(encoding='utf-8')
@@ -25,9 +33,9 @@ def audit_file(path, private_terms=()):
     if pattern and pattern.search(text):
         errors.append('private marker')
     if path.suffix == '.md':
-        for target in LINK.findall(text):
+        for target in LINK.findall(FENCE.sub('', text)):
             target = target.split('#', 1)[0]
-            if target and not re.match(r'^(?:https?://|mailto:|<)', target) and not (path.parent / target).exists():
+            if target and not re.match(r'^(?:https?://|mailto:|<)', target) and not link_exists(path.parent, target):
                 errors.append('broken link: ' + target)
     if path.name == 'SKILL.md':
         parts = text.split('---', 2)
