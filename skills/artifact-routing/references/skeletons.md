@@ -107,8 +107,9 @@ In every skeleton the stamp (`As of <date>`, version or revision, owner role) si
   1. Summary: what broke, the impact, the fix.
   2. Impact with numbers.
   3. Contributing causes in systems and processes. Describe what failed, never who failed.
-  4. What went well and what was lucky.
-  5. Action items: one owner, one ticket, one checkable end state each.
-  6. Timeline last, with the source of each entry.
-- **Common failure.** A timeline before the summary, or blame on a person. Fix: lead with impact and use system subjects ("the pipeline had no schema validation").
+  4. Wrong turns: each hypothesis or action pursued and then dropped, with what it looked like, why it was wrong, the evidence that dropped it and what to check first next time. List only turns the sources support. When there were none, write one line starting "None" and invent nothing.
+  5. What went well and what was lucky.
+  6. Action items: one owner, one ticket, one checkable end state each.
+  7. Timeline last, with the source of each entry.
+- **Common failure.** A timeline before the summary, or blame on a person. Fix: lead with impact and use system subjects ("the pipeline had no schema validation"). A related failure is a straight line from incident to fix that hides the misleading signals, so the next responder repeats the detour. Fix: record each dropped path under Wrong turns, as a misleading signal with a system subject. A rejected fix that was weighed as an option belongs in contributing causes or action items.
 - **Type.** Explanation. The action items are a How-to list owned by the team.

@@ -55,6 +55,15 @@ Optional sibling skills are referenced by name; when installed alone, use the fa
 
 The `humanize` and `humanize-heavy` AI-tell lists draw in part on [Wikipedia's Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing); their rewrite procedure and scorer are maintained here. `ub-mode` is external work by Robert C. Martin and is not bundled; consult its own license before use. The artifact routing approach draws on [Diataxis](https://diataxis.fr/).
 
+Some procedures adapt techniques, in our own words, from other skill collections:
+
+- [mattpocock/skills](https://github.com/mattpocock/skills) (MIT): exact-symptom reproduction and falsifiable causes in `root-cause`, the spec check in `critical-code-review`, the ADR rule in `staged-engineering`, the deletion test in `clean-architecture`, expand-contract cards in `task-cards`.
+- [obra/superpowers](https://github.com/obra/superpowers) (MIT): boundary logging and test-order bisection in `root-cause`, independent test oracles in `critical-code-review` and `python-idioms`, handling received review comments in `publish-pull-request`.
+- [riekelt/technical-writer](https://github.com/riekelt/technical-writer) (MIT): goals, costs and fallback in `decision-rfc`, wrong turns in the postmortem skeleton of `artifact-routing`, three patterns in `humanize`.
+- [ccheney/robust-skills](https://github.com/ccheney/robust-skills) (MIT): the outbox and idempotent consumer note in `clean-architecture`.
+- [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman) (Apache-2.0): the expand, migrate and contract sequence in `task-cards`.
+- The removed-protection check in `pull-request-review` follows an idea from [trailofbits/skills](https://github.com/trailofbits/skills) (CC BY-SA 4.0); no wording is adapted.
+
 ## License
 
 [MIT](LICENSE). The existing `humanize` scorer credits the external source in its skill.

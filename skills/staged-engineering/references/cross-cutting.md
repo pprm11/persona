@@ -2,7 +2,7 @@
 
 ## Source and decisions
 
-- Team decisions file (`decisions-rN.md`): `| Id | Topic | Decision | Effect on the series |`, one row per owner answer, with a date. A decision the user gives in the conversation goes into the file at once (an agent once reopened a question because the file still said "pending").
+- Team decisions file (`decisions-rN.md`): `| Id | Topic | Decision | Effect on the series |`, one row per owner answer or routine choice, with a date. A decision the user gives in the conversation goes into the file at once (an agent once reopened a question because the file still said "pending").
 - In the document: "Team decision, DD/MM/YYYY". A person's name appears only as the owner of a Q# or of a component.
 - Questions for the owners are always explicit: Q#, the question, the owner, what changes with each answer. In the artifact, a "Decisions and open questions" block with a copy button helps the user send them.
 - A dated document: what was "current" may have passed. Write "as of <date>".

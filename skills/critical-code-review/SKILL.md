@@ -22,13 +22,21 @@ findings with file:line, severity, a concrete failure scenario and a suggested f
 - **CR1 bugs and behavior**: error paths, fail-open, per-run state not cleaned, concurrency, test
   regressions, regex erasing a response.
 - **CR2 architecture (Google eng-practices)**: design, layers, duplication, names, complexity, tests that test
-  what matters, dead code. Apply the `ub-mode` metrics to the files in the diff when the tools are available.
+  what matters, dead code. Test oracles must be independent: expected values come from a hand-derived literal or
+  an independent source; a value recomputed the way the code computes it proves nothing, and a fixture whose
+  expected value mirrors the implementation is a finding. Apply the `ub-mode` metrics to the files in the diff when the tools are available.
 - **CR3 prompts and rules**: contradictions between prompt, condensed rules, tool docstrings and code;
   instructions the model cannot follow; prompt size.
 - **CR4 scope, security and hygiene**: does each hunk belong to the task (branch holds only the task's scope)?
   Instrumentation, lab artifacts, `.env`, secrets, real data in tests, needlessly formatted files, changes from
   another branch. A subtraction the change requires, pinned by a test and with the suite proving behavior did
   not change, belongs to the task (ub-mode, Subtract Before You Add); loose refactoring remains a finding.
+  Spec check: list the ticket or spec requirements and mark each as met, partial, missing or wrong, quoting the
+  spec line for every item that is not met. Follow a requirement beyond the diff to its callers, config and docs.
+  An inherited gap unrelated to the requested outcome becomes a follow-up note and does not block the push. An
+  unmet requirement, or an existing weakness that the change now exposes or depends on, is judged by its impact
+  like any other finding, whoever wrote the old code. When every requirement is met, say so with the mapping and
+  add no gap of your own; without a spec, note that.
 
 ## 3. Triage and correction
 
