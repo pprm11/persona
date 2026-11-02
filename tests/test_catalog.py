@@ -32,6 +32,25 @@ class CatalogTests(unittest.TestCase):
             p.write_text('["["]', encoding='utf-8')
             self.assertEqual(2, release(ROOT, str(p)))
 
+    def test_fenced_links_and_privacy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "document.md"
+            cases = [
+                ("```lang\n[inside](missing.md)\n````\n[after](missing.md)\n", ["broken link: missing.md"]),
+                ("```\nexample\n````\n[after](missing.md)\n````\nexample\n````\n", ["broken link: missing.md"]),
+                ("~~~lang\n[inside](missing.md)\n~~~~~\n[after](...)\n", ["broken link: ..."]),
+                ("````\n```\n[inside](missing.md)\n````\n[after](missing.md)\n", ["broken link: missing.md"]),
+                ("~~~\n```\n[inside](missing.md)\n~~~~\n", []),
+            ]
+            for text, expected in cases:
+                with self.subTest(text=text):
+                    path.write_text(text, encoding="utf-8")
+                    self.assertEqual(expected, audit_file(path))
+            path.write_text("```\nPRIVATE_FIXTURE\n````\n", encoding="utf-8")
+            self.assertIn("private marker", audit_file(path, ["PRIVATE_FIXTURE"]))
+            path.write_text("```\n" + "sk-" + "abcdefghijklmnopqrstuv" + "\n````\n", encoding="utf-8")
+            self.assertIn("secret token", audit_file(path))
+
     def test_negative_controls(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp)/'sample'; folder.mkdir(); path=folder/'SKILL.md'

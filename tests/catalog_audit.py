@@ -16,7 +16,27 @@ GENERIC = {
 
 LINK = re.compile(r'(?<!!)\[[^\]]+\]\(([^)]+)\)')
 # Links inside a fenced block are examples, such as template placeholders, and are not checked.
-FENCE = re.compile(r'(?ms)^[ \t]*(`{3,}|~{3,}).*?^[ \t]*\1[ \t]*$')
+FENCE_OPEN = re.compile(r'^[ \t]*(`{3,}|~{3,})')
+FENCE_CLOSE = re.compile(r'^[ \t]*(`{3,}|~{3,})[ \t]*$')
+
+
+def outside_fences(text):
+    lines = []
+    fence = None
+    for line in text.splitlines(keepends=True):
+        if fence is None:
+            match = FENCE_OPEN.match(line)
+            if match:
+                fence = match.group(1)
+                lines.append("\n")
+            else:
+                lines.append(line)
+        else:
+            match = FENCE_CLOSE.fullmatch(line.rstrip("\r\n"))
+            if match and match.group(1)[0] == fence[0] and len(match.group(1)) >= len(fence):
+                fence = None
+            lines.append("\n")
+    return "".join(lines)
 
 def link_exists(folder, target):
     # Windows drops trailing dots and spaces from a path segment, so '...' would resolve to the folder itself.
@@ -33,7 +53,7 @@ def audit_file(path, private_terms=()):
     if pattern and pattern.search(text):
         errors.append('private marker')
     if path.suffix == '.md':
-        for target in LINK.findall(FENCE.sub('', text)):
+        for target in LINK.findall(outside_fences(text)):
             target = target.split('#', 1)[0]
             if target and not re.match(r'^(?:https?://|mailto:|<)', target) and not link_exists(path.parent, target):
                 errors.append('broken link: ' + target)
