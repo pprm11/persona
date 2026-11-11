@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Explained by cats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* One 9:16 reel centred on the page. Each .slide is a scene: cats, eyebrow, headline, body, translation. */
+:root {
+  --page: #efe9e1; --page-fg: #2a2630; --muted: #6e6774;
+  --ink: #1d1a24; --paper: #fffaf3;
+  --sun: #ffcf4a; --mint: #58d6a0; --tomato: #ff6b57; --lilac: #c3b8f5; --sky: #98d6ff;
+  --pink: #ff9db4; --ginger: #f2994a; --grey: #9aa0ab; --cream: #f3e3c3; --black: #2e2b36;
+  --display: "Special Elite", "Courier New", Courier, monospace;
+  --body: "Courier Prime", "Courier New", Courier, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --page: #121019; --page-fg: #ebe7f0; --muted: #a29bab; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --page: #121019; --page-fg: #ebe7f0; --muted: #a29bab; color-scheme: dark; }
+
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--page); color: var(--page-fg); font-family: var(--body);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px));
+  box-sizing: border-box;
+}
+.reel {
+  position: relative; width: min(100%, 420px, calc((100dvh - 80px) * 9 / 16));
+  aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden;
+  background-color: #050508;
+  background-image:
+    radial-gradient(1px 1px at 12px 18px, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 47px 63px, rgba(255,255,255,.8) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 83px 29px, rgba(255,255,255,.9) 50%, transparent 51%),
+    radial-gradient(1px 1px at 29px 104px, rgba(255,255,255,.7) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 140px 160px, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 190px 40px, rgba(255,255,255,.7) 50%, transparent 51%);
+  background-size: 113px 113px, 113px 113px, 113px 113px, 113px 113px, 233px 233px, 233px 233px;
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,.45);
+  user-select: none; -webkit-user-select: none; touch-action: manipulation;
+  container-type: inline-size;
+}
+.bars { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; z-index: 5; }
+.bar { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.4); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: #fff; }
+.top { position: absolute; top: 22px; left: 12px; right: 12px; display: flex; align-items: center; gap: 8px; z-index: 5; color: #fff; font-size: 13px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,.4); }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--sun); display: grid; place-items: center; overflow: hidden; }
+.avatar svg { width: 24px; height: 22px; }
+.top .sp { flex: 1; }
+.top button { all: unset; cursor: pointer; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; }
+.top button:focus-visible, .nav:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.slide {
+  position: absolute; inset: 0; padding: 68px 22px 88px; box-sizing: border-box;
+  display: flex; flex-direction: column; justify-content: center; gap: 12px;
+  color: #f7f4ee; visibility: hidden; text-align: center;
+}
+.slide.on { visibility: visible; }
+.list, .swap, .links, .tr { text-align: left; }
+.watermark { position: absolute; top: 58px; left: 0; right: 0; text-align: center; z-index: 3; font-family: var(--display); font-size: 12px; color: rgba(255,255,255,.35); pointer-events: none; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
+h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(24px, 8cqi, 34px); line-height: 1.12; text-wrap: balance; }
+p { margin: 0; font-size: clamp(14px, 4.2cqi, 18px); line-height: 1.35; text-wrap: pretty; }
+.big { font-family: var(--display); font-weight: 800; font-size: clamp(72px, 26cqi, 120px); line-height: .85; letter-spacing: -.04em; }
+.hl { background: var(--hl, var(--sun)); color: var(--ink); padding: 0 .12em; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.tr { font-size: 12.5px; font-weight: 600; opacity: .8; border-top: 1.5px dashed currentColor; padding-top: 8px; }
+.tr b { font-weight: 800; }
+
+.scene { display: flex; align-items: flex-end; justify-content: center; gap: 6px; min-height: 0; }
+.cat { width: var(--w, 40cqi); max-width: 100%; height: auto; display: block; }
+.cat.sm { --w: 22cqi; } .cat.xs { --w: 15cqi; } .cat.lg { --w: 52cqi; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.tag { padding: 5px 10px; border-radius: 999px; font-weight: 700; font-size: 13px; background: var(--c); color: var(--ink); }
+.list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.list li { display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: start; font-size: clamp(14px, 4.1cqi, 17px); line-height: 1.3; }
+.list b.n { font-family: var(--display); font-size: 20px; line-height: 1; }
+
+.tower { display: grid; gap: 4px; justify-items: center; }
+.tower .cat { --w: 20cqi; margin-bottom: -6px; position: relative; z-index: 1; }
+.floor { width: 100%; box-sizing: border-box; border-radius: 8px; padding: 7px 12px; color: var(--ink); background: var(--c); display: flex; justify-content: space-between; gap: 8px; align-items: baseline; border: 2px solid var(--ink); }
+.floor b { font-family: var(--display); font-size: 16px; }
+.floor span { font-size: 12px; font-weight: 600; opacity: .8; text-align: right; }
+
+.swap { display: grid; gap: 7px; }
+.swap div { border: 2px solid currentColor; border-radius: 12px; padding: 8px 12px; font-size: clamp(13px, 4cqi, 16px); line-height: 1.3; }
+.swap b { display: block; font-family: var(--display); font-size: clamp(16px, 4.8cqi, 20px); }
+
+.feeder { display: flex; align-items: flex-end; gap: 10px; justify-content: center; }
+.meow { background: var(--paper); color: var(--ink); border-radius: 14px; padding: 8px 12px; font-weight: 700; font-size: 14px; position: relative; max-width: 46cqi; }
+.meow::after { content: ""; position: absolute; left: 18px; bottom: -8px; border: 8px solid transparent; border-top-color: var(--paper); border-bottom: 0; }
+
+.links { display: grid; gap: 10px; }
+.links a { position: relative; z-index: 6; display: block; padding: 13px 16px; border-radius: 12px; background: var(--paper); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 16px; }
+.links a small { display: block; font-weight: 400; font-size: 13px; color: #5c5566; }
+
+.caption { position: absolute; left: 14px; right: 14px; bottom: 14px; z-index: 5; color: #fff; font-size: 13px; line-height: 1.35; text-shadow: 0 1px 3px rgba(0,0,0,.5); pointer-events: none; }
+.caption .tune { display: flex; gap: 6px; align-items: center; margin-top: 4px; opacity: .9; font-size: 12px; }
+.nav { position: absolute; top: 60px; bottom: 70px; z-index: 4; background: none; border: 0; cursor: pointer; padding: 0; }
+.nav.prev { left: 0; width: 34%; } .nav.next { right: 0; width: 66%; }
+.paused-tag { position: absolute; inset: 0; display: grid; place-items: center; z-index: 4; pointer-events: none; }
+.paused-tag span { background: rgba(0,0,0,.5); color: #fff; padding: 8px 14px; border-radius: 999px; font-weight: 700; font-size: 13px; }
+.hint { font-size: 13px; color: var(--muted); text-align: center; max-width: 420px; margin: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .slide.on .in { animation: up .55s cubic-bezier(.2,.8,.2,1) both; }
+  .slide.on .in:nth-child(2) { animation-delay: .1s; }
+  .slide.on .in:nth-child(3) { animation-delay: .22s; }
+  .slide.on .in:nth-child(4) { animation-delay: .36s; }
+  .slide.on .in:nth-child(5) { animation-delay: .5s; }
+  .slide.on .cat.bob { animation: bob 2.4s ease-in-out .6s infinite; }
+  @keyframes up { from { transform: translateY(14px); opacity: .001; } to { transform: none; opacity: 1; } }
+  @keyframes bob { 0%,100% { transform: none; } 50% { transform: translateY(-4px) rotate(-2deg); } }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Cat faces. Fur colour comes from --fur on the <svg> that uses the symbol. -->
+    <symbol id="cat" viewBox="0 0 120 112"><!-- open eyes -->
+      <path d="M16 52 L26 6 L54 30 Z" fill="var(--fur)" stroke="#1d1a24" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M104 52 L94 6 L66 30 Z" fill="var(--fur)" stroke="#1d1a24" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M26 40 L29 18 L44 31 Z" fill="#ff9db4"/><path d="M94 40 L91 18 L76 31 Z" fill="#ff9db4"/>
+      <ellipse cx="60" cy="66" rx="46" ry="40" fill="var(--fur)" stroke="#1d1a24" stroke-width="3"/>
+      <ellipse cx="42" cy="62" rx="7" ry="9" fill="#1d1a24"/><ellipse cx="78" cy="62" rx="7" ry="9" fill="#1d1a24"/>
+      <circle cx="44.5" cy="58.5" r="2.4" fill="#fff"/><circle cx="80.5" cy="58.5" r="2.4" fill="#fff"/>
+      <path d="M55 76 L65 76 L60 82 Z" fill="#ff6b8a"/>
+      <path d="M60 82 Q60 89 52 89 M60 82 Q60 89 68 89" fill="none" stroke="#1d1a24" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M30 78 L6 74 M30 84 L8 88 M90 78 L114 74 M90 84 L112 88" stroke="#1d1a24" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="catz" viewBox="0 0 120 112"><!-- sleepy -->
+      <path d="M16 52 L26 6 L54 30 Z" fill="var(--fur)" stroke="#1d1a24" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M104 52 L94 6 L66 30 Z" fill="var(--fur)" stroke="#1d1a24" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M26 40 L29 18 L44 31 Z" fill="#ff9db4"/><path d="M94 40 L91 18 L76 31 Z" fill="#ff9db4"/>
+      <ellipse cx="60" cy="66" rx="46" ry="40" fill="var(--fur)" stroke="#1d1a24" stroke-width="3"/>
+      <path d="M34 62 Q42 70 50 62 M70 62 Q78 70 86 62" fill="none" stroke="#1d1a24" stroke-width="3" stroke-linecap="round"/>
+      <path d="M55 76 L65 76 L60 82 Z" fill="#ff6b8a"/>
+      <path d="M60 82 Q60 89 52 89 M60 82 Q60 89 68 89" fill="none" stroke="#1d1a24" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M30 78 L6 74 M30 84 L8 88 M90 78 L114 74 M90 84 L112 88" stroke="#1d1a24" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="cato" viewBox="0 0 120 112"><!-- startled -->
+      <path d="M16 52 L26 6 L54 30 Z" fill="var(--fur)" stroke="#1d1a24" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M104 52 L94 6 L66 30 Z" fill="var(--fur)" stroke="#1d1a24" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M26 40 L29 18 L44 31 Z" fill="#ff9db4"/><path d="M94 40 L91 18 L76 31 Z" fill="#ff9db4"/>
+      <ellipse cx="60" cy="66" rx="46" ry="40" fill="var(--fur)" stroke="#1d1a24" stroke-width="3"/>
+      <circle cx="42" cy="62" r="11" fill="#fff" stroke="#1d1a24" stroke-width="2.5"/><circle cx="78" cy="62" r="11" fill="#fff" stroke="#1d1a24" stroke-width="2.5"/>
+      <circle cx="42" cy="62" r="4" fill="#1d1a24"/><circle cx="78" cy="62" r="4" fill="#1d1a24"/>
+      <path d="M55 78 L65 78 L60 84 Z" fill="#ff6b8a"/><ellipse cx="60" cy="92" rx="5" ry="6" fill="#1d1a24"/>
+      <path d="M30 80 L6 76 M30 86 L8 90 M90 80 L114 76 M90 86 L112 90" stroke="#1d1a24" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="reel" id="reel" aria-roledescription="carousel" aria-label="SUBJECT explained by cats">
+  <div class="bars" id="bars"></div>
+  <div class="top">
+    <div class="avatar" aria-hidden="true"><svg viewBox="0 0 120 112" style="--fur:var(--ginger)"><use href="#cat"/></svg></div>
+    <span>HANDLE</span><span style="opacity:.7;font-weight:400">· explained by cats</span>
+    <span class="sp"></span>
+    <button id="pp" aria-label="Pause"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><g id="ppIcon" fill="#fff"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></g></svg></button>
+  </div>
+
+  <!-- EXAMPLE SLIDES: replace them. Patterns available: .scene of cats, .tags, .list, .big number,
+       .feeder + .meow speech bubble, .tower of .floor layers, .swap cards, .links on the last slide.
+       Every content slide ends with a .tr translation line. -->
+
+  <!-- 1 · hook -->
+  <section class="slide">
+    <div class="scene in">
+      <svg class="cat sm" viewBox="0 0 120 112" style="--fur:var(--grey)" aria-hidden="true"><use href="#catz"/></svg>
+      <svg class="cat lg bob" viewBox="0 0 120 112" style="--fur:var(--ginger)" aria-hidden="true"><use href="#cat"/></svg>
+      <svg class="cat sm" viewBox="0 0 120 112" style="--fur:var(--black)" aria-hidden="true"><use href="#cat"/></svg>
+    </div>
+    <div class="eyebrow in">TOPIC</div>
+    <h2 class="in">Explained by <span class="hl" style="--hl:#fffaf3">cats</span></h2>
+    <p class="in">The problem in one line, in cat terms.</p>
+  </section>
+
+  <!-- 2 · today's pain -->
+  <section class="slide">
+    <div class="eyebrow in">Today</div>
+    <h2 class="in">The cat that does everything</h2>
+    <div class="scene in"><svg class="cat lg" viewBox="0 0 120 112" style="--fur:var(--ginger)" aria-hidden="true"><use href="#cato"/></svg></div>
+    <div class="tags in">
+      <span class="tag" style="--c:var(--sun)">job one</span>
+      <span class="tag" style="--c:var(--mint)">job two</span>
+      <span class="tag" style="--c:var(--sky)">job three</span>
+    </div>
+    <p class="tr in"><b>Translation:</b> what this means in the source document.</p>
+  </section>
+
+  <!-- 3 · a rule the cat cannot talk past -->
+  <section class="slide">
+    <div class="eyebrow in">Idea 1</div>
+    <h2 class="in">The <span class="hl">automatic feeder</span></h2>
+    <div class="feeder in">
+      <svg class="cat" viewBox="0 0 120 112" style="--fur:var(--grey);--w:30cqi" aria-hidden="true"><use href="#cat"/></svg>
+      <div class="meow">"Feed me now!"</div>
+    </div>
+    <p class="in">The cat can meow all it wants. Food comes out on schedule.</p>
+    <p class="tr in"><b>Translation:</b> the model talks; a fixed flow decides.</p>
+  </section>
+
+  <!-- 4 · a number from the source -->
+  <section class="slide">
+    <div class="eyebrow in">The number</div>
+    <div class="big in">N</div>
+    <p class="in">The figure, quoted from the source, told as a cat story.</p>
+    <p class="tr in"><b>Translation:</b> where the number comes from and why it matters.</p>
+  </section>
+
+  <!-- 5 · layers -->
+  <section class="slide">
+    <div class="eyebrow in">Idea 2</div>
+    <h2 class="in">The cat tree</h2>
+    <div class="tower in">
+      <svg class="cat bob" viewBox="0 0 120 112" style="--fur:var(--ginger)" aria-hidden="true"><use href="#cat"/></svg>
+      <div class="floor" style="--c:var(--lilac)"><b>Top layer</b><span>role</span></div>
+      <div class="floor" style="--c:var(--sky)"><b>Middle layer</b><span>role</span></div>
+      <div class="floor" style="--c:var(--sun)"><b>Base layer</b><span>role</span></div>
+    </div>
+    <p class="tr in"><b>Translation:</b> each layer rests only on the one below.</p>
+  </section>
+
+  <!-- last · links back to the source -->
+  <section class="slide">
+    <div class="scene in"><svg class="cat bob" viewBox="0 0 120 112" style="--fur:var(--ginger)" aria-hidden="true"><use href="#cat"/></svg></div>
+    <div class="eyebrow in">Want it without cats?</div>
+    <h2 class="in">Read the rest</h2>
+    <div class="links in">
+      <a href="#" target="_blank" rel="noopener">Full document<small>Where every number comes from</small></a>
+    </div>
+  </section>
+
+  <div class="watermark" aria-hidden="true">explained by cats</div>
+  <button class="nav prev" id="prev" aria-label="Previous scene"></button>
+  <button class="nav next" id="next" aria-label="Next scene"></button>
+  <div class="paused-tag" id="pausedTag" hidden><span>Paused</span></div>
+
+  <div class="caption">
+    <b>HANDLE</b> One-line caption for the whole reel.
+    <div class="tune"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path fill="#fff" d="M4 1v7.2A2 2 0 1 0 5 10V3.5l5-1.2v4.9A2 2 0 1 0 11 9V0z"/></svg>original purring · AUTHOR</div>
+  </div>
+</div>
+<p class="hint">Tap right to advance, left to go back. Hold to pause. Keyboard: arrows and space.</p>
+
+<script>
+(function () {
+  var reel = document.getElementById('reel');
+  var slides = Array.prototype.slice.call(reel.querySelectorAll('.slide'));
+  var barsEl = document.getElementById('bars');
+  var pp = document.getElementById('pp'), ppIcon = document.getElementById('ppIcon');
+  var pausedTag = document.getElementById('pausedTag');
+  var DUR = 7000, LAST_DUR = 12000;
+  var bars = slides.map(function () {
+    var b = document.createElement('div'); b.className = 'bar';
+    b.appendChild(document.createElement('i')); barsEl.appendChild(b); return b;
+  });
+  var idx = 0, elapsed = 0, last = null, paused = false, held = false;
+
+  function dur(k) { return k === slides.length - 1 ? LAST_DUR : DUR; }
+  function show(k) {
+    idx = Math.max(0, Math.min(slides.length - 1, k)); elapsed = 0;
+    slides.forEach(function (s, j) { s.classList.toggle('on', j === idx); s.setAttribute('aria-hidden', j === idx ? 'false' : 'true'); });
+    bars.forEach(function (b, j) { b.firstChild.style.width = j < idx ? '100%' : '0'; });
+  }
+  function setPaused(v) {
+    paused = v; pp.setAttribute('aria-label', v ? 'Play' : 'Pause');
+    ppIcon.innerHTML = v ? '<path d="M4 2l10 6-10 6z"/>' : '<rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/>';
+    pausedTag.hidden = !v;
+  }
+  function tick(t) {
+    if (last !== null && !paused && !held) {
+      elapsed += t - last;
+      var d = dur(idx);
+      bars[idx].firstChild.style.width = Math.min(100, elapsed / d * 100) + '%';
+      if (elapsed >= d) {
+        if (idx < slides.length - 1) show(idx + 1);
+        else { elapsed = d; setPaused(true); }
+      }
+    }
+    last = t; requestAnimationFrame(tick);
+  }
+
+  var holdTimer = null, wasHold = false;
+  function bindNav(el, step) {
+    el.addEventListener('pointerdown', function () {
+      wasHold = false;
+      holdTimer = setTimeout(function () { held = true; wasHold = true; }, 260);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) {
+      el.addEventListener(ev, function () { clearTimeout(holdTimer); held = false; });
+    });
+    el.addEventListener('click', function () {
+      if (wasHold) { wasHold = false; return; }
+      if (paused && idx === slides.length - 1 && step > 0) { show(0); setPaused(false); return; }
+      show(idx + step);
+    });
+  }
+  bindNav(document.getElementById('next'), 1);
+  bindNav(document.getElementById('prev'), -1);
+  pp.addEventListener('click', function () { setPaused(!paused); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') show(idx + 1);
+    else if (e.key === 'ArrowLeft') show(idx - 1);
+    else if (e.key === ' ') { e.preventDefault(); setPaused(!paused); }
+  });
+  document.addEventListener('visibilitychange', function () { last = null; });
+
+  show(0);
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

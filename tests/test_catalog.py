@@ -6,7 +6,7 @@ from catalog_audit import audit_file, release, candidate_files
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / 'skills'
-EXPECTED = set('brief root-cause critical-code-review staged-engineering humanize humanize-heavy cross-harness-orchestration claude-workflow-orchestration inline-widgets clean-architecture artifact-routing tree-search task-cards measured-correction context-ingest context-recall session-closeout python-idioms pull-request-description pull-request-review publish-pull-request decision-rfc secret-backup outcome-driven-development'.split())
+EXPECTED = set('brief root-cause critical-code-review staged-engineering humanize humanize-heavy cross-harness-orchestration claude-workflow-orchestration inline-widgets clean-architecture artifact-routing tree-search task-cards measured-correction context-ingest context-recall session-closeout python-idioms pull-request-description pull-request-review publish-pull-request decision-rfc secret-backup outcome-driven-development explained-by-cats'.split())
 
 class CatalogTests(unittest.TestCase):
     def test_catalog(self):
