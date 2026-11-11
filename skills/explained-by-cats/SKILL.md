@@ -22,7 +22,7 @@ A reel retells one document in 8 to 12 scenes. Each scene shows cats doing somet
 5. **Build it.**
    - **Page:** copy [assets/reel-template.html](assets/reel-template.html), replace its example slides, keep its player (progress bars, tap left or right, hold to pause, arrow keys and space), the three cat faces (`#cat` open, `#catz` sleepy, `#cato` startled) and the fur colours. Set the header handle and the caption to the subject. Load the platform's page-design guidance before publishing when it has one.
    - **Script:** per scene give the time range, the shot (what the cats do), on-screen text and narration. Aim for 60 to 90 seconds; the first scene must hook in the first 3 seconds.
-6. **Check before delivery:** every number traces to the source; every scene has its translation; text fits the 9:16 frame at phone width; the copy reads like a person wrote it (run `humanize` if installed).
+6. **Check before delivery:** every number traces to the source; every scene has its translation; the copy reads like a person wrote it (run `humanize` if installed). Open the page at a small phone (375x667), a tall phone (375x812) and a desktop window, and confirm on every slide that no element overlaps another, the header or the caption. The template's fit guard (no flex shrink, `safe center`, zoom down to 60%) prevents overlap; if a slide still needs zoom below 0.9, split it instead of shrinking it.
 
 ## Confidentiality
 
